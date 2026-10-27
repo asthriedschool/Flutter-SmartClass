@@ -1,0 +1,94 @@
+---
+description: Kontrak integrasi API, JWT, token storage, dan role untuk Flutter Smart Class.
+globs: lib/services/**/*.dart, lib/network/**/*.dart, lib/storage/**/*.dart, lib/models/**/*.dart
+alwaysApply: false
+---
+
+# Smart Class — API and Authentication
+
+## Konfigurasi API
+- Simpan base URL di satu tempat, misalnya `lib/config/api_config.dart`.
+- Untuk Android Emulator yang mengakses backend di komputer pengembang, gunakan `http://10.0.2.2:8081/api`.
+- Jangan gunakan `localhost` dari Android Emulator untuk mengakses backend host.
+- Untuk HP fisik, gunakan alamat IP LAN komputer dan pastikan backend/firewall mengizinkan koneksi.
+- Jangan hardcode URL berulang di service.
+
+## Kontrak autentikasi yang sudah ada
+### Login
+`POST /api/auth/login`
+
+Request:
+```json
+{
+  "email": "email pengguna",
+  "password": "password pengguna"
+}
+```
+
+Response saat berhasil berisi:
+- `accessToken`
+- `refreshToken`
+- `tokenType`
+- `expiresInSeconds`
+
+### Register
+`POST /api/auth/register`
+
+Request mengikuti backend:
+- `fullName`
+- `email`
+- `password`
+
+Registrasi umum menghasilkan role `PETUGAS` dari backend. Jangan mengirim atau memilih role dari form register.
+
+### Refresh token
+`POST /api/auth/refresh`
+
+Request:
+```json
+{
+  "refreshToken": "refresh token yang disimpan"
+}
+```
+
+Response mengikuti `AuthResponse` backend yang sudah ada. Jangan mengubah nama field JSON tanpa memperbarui kontrak backend secara eksplisit.
+
+## Penyimpanan dan penggunaan token
+1. Simpan access token dan refresh token menggunakan secure storage.
+2. Jangan simpan password setelah login.
+3. Jangan mencetak token atau kredensial ke console/log.
+4. Tambahkan header `Authorization: Bearer <accessToken>` pada request terlindungi.
+5. Saat refresh sukses, simpan token yang dikembalikan backend.
+6. Saat refresh gagal karena token tidak valid/expired/revoked, hapus token lokal dan arahkan pengguna ke login.
+7. Logout harus menghapus token lokal. Jangan mengklaim refresh token dicabut di backend kecuali endpoint revoke/logout backend benar-benar tersedia.
+8. Jangan menambahkan interceptor/auto-refresh kompleks sebelum login dan request terautentikasi dasar berhasil diuji.
+
+## Role dan keamanan
+- Role yang valid: `ADMIN` dan `PETUGAS`.
+- Jika aplikasi membaca claim JWT untuk menentukan layar awal, perlakukan itu sebagai informasi UI saja. Backend tetap memvalidasi token dan role untuk setiap endpoint.
+- Jangan menganggap decoding payload JWT di Flutter sebagai verifikasi tanda tangan JWT.
+- Jangan menentukan role dari `id_user`, email, nama, atau input yang bisa diubah pengguna.
+- Jangan menaruh access token atau refresh token pada URL, pesan error, atau log.
+- Jangan menampilkan password BCrypt atau properti password lain dalam response UI.
+
+## Endpoint Smart Class yang telah tersedia
+Gunakan path berikut jika dibutuhkan dan sesuai controller yang ada:
+- `/api/auth/login`
+- `/api/auth/register`
+- `/api/auth/refresh`
+- `/api/users`
+- `/api/rooms`
+- `/api/devices`
+- `/api/schedules`
+- `/api/device-commands`
+- `/api/detection-logs`
+- `/api/activity-logs`
+
+Sebelum memakai endpoint baru, pastikan controller dan response JSON-nya benar-benar tersedia. Jangan mengasumsikan bentuk response hanya dari nama endpoint.
+
+## Penanganan error
+- Tangani status HTTP non-2xx sebagai error yang bisa ditampilkan secara aman.
+- Jangan tampilkan stack trace, SQL, hash password, secret, atau token kepada pengguna.
+- Bedakan error validasi, kredensial salah, tidak terautentikasi (401), tidak berwenang (403), masalah koneksi, dan error server jika respons backend mendukung pembedaan tersebut.
+- Gunakan timeout dan pesan error yang ramah pengguna bila sesuai.
+- Jangan menganggap semua 401 pasti token expired; endpoint login juga dapat menggunakan 401 untuk kredensial salah.

@@ -1,0 +1,56 @@
+---
+description: Konvensi struktur dan kualitas kode untuk project Flutter Smart Class.
+globs: lib/**/*.dart, test/**/*.dart
+alwaysApply: false
+---
+
+# Smart Class — Flutter Code Organization
+
+## Struktur yang disarankan
+Ikuti struktur yang sudah ada terlebih dahulu. Jangan memindahkan file yang ada tanpa kebutuhan.
+
+```text
+lib/
+├── main.dart
+├── config/
+│   └── api_config.dart
+├── models/
+├── services/
+├── storage/
+├── network/
+├── screens/
+│   ├── login/
+│   ├── register/
+│   ├── admin/
+│   └── petugas/
+└── widgets/
+```
+
+## Konvensi Dart
+- Nama file menggunakan `snake_case.dart`.
+- Nama class menggunakan `PascalCase`.
+- Variabel dan method menggunakan `lowerCamelCase`.
+- Gunakan null safety dan tipe yang jelas; hindari `dynamic` kecuali benar-benar diperlukan untuk parsing JSON.
+- Gunakan `const` pada widget/objek yang bisa dibuat const.
+- Pindahkan request HTTP dari widget ke service.
+- Pisahkan model JSON dari UI.
+- Pastikan controller dan FocusNode dibersihkan melalui `dispose()`.
+- Periksa `mounted` sebelum menggunakan `BuildContext` setelah operasi async.
+- Hindari duplikasi parsing response dan konfigurasi API.
+
+## Model dan dependency
+- Pertahankan model sederhana yang sudah digunakan project, kecuali ada alasan jelas untuk menggantinya.
+- Jangan menambahkan Freezed, code generation, `Result<T, E>`, state-management library, router, atau package baru tanpa kebutuhan nyata dan persetujuan pengguna.
+- Jangan menjalankan perubahan besar pada `pubspec.yaml` jika task hanya membutuhkan UI sederhana.
+- Jika package baru dibutuhkan, jelaskan fungsi dan dampaknya terlebih dahulu.
+
+## Pola kerja saat melakukan perubahan
+1. Baca file yang relevan sebelum mengedit.
+2. Pertahankan API publik dan nama field yang sudah digunakan file lain.
+3. Jangan menulis ulang `main.dart` atau mengganti arsitektur aplikasi untuk perubahan satu widget, kecuali memang diperlukan.
+4. Jangan membuat file dummy, mock API, atau data hardcoded sebagai pengganti backend tanpa menandainya secara jelas dan meminta persetujuan.
+5. Jangan menghapus fitur yang sudah berjalan ketika menambah fitur baru.
+6. Setelah perubahan, jalankan `dart format` pada file yang diubah dan `flutter analyze`.
+7. Jika test tersedia, jalankan test yang relevan.
+8. Laporkan file yang diubah, hasil analisis/test, dan langkah manual yang perlu dicoba pengguna.
+9. Jika konteks kode tidak cukup, minta file terkait daripada mengarang implementasi.
