@@ -1,0 +1,38 @@
+#lib layer structure
+
+lib/
+├── main.dart
+│
+├── config/
+│   └── api_config.dart
+│
+├── models/
+│   ├── auth_response.dart
+│   ├── user.dart
+│   ├── room.dart
+│   ├── device.dart
+│   └── schedule.dart
+│
+├── services/
+│   ├── auth_service.dart
+│   ├── room_service.dart
+│   ├── device_service.dart
+│   └── schedule_service.dart
+│
+├── storage/
+│   └── token_storage.dart
+│
+├── network/
+│   └── api_client.dart
+│
+├── screens/
+│   ├── login/
+│   │   └── login_screen.dart
+│   │
+│   ├── admin/
+│   │   └── admin_dashboard.dart
+│   │
+│   └── petugas/
+│       └── petugas_dashboard.dart
+│
+└── widgets/
