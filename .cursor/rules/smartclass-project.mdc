@@ -1,0 +1,61 @@
+---
+description: Konteks utama project Smart Class Flutter dan aturan sistem yang selalu berlaku.
+alwaysApply: true
+---
+
+# Smart Class — Project Context
+
+## Tujuan aplikasi
+Smart Class adalah aplikasi mobile untuk monitoring dan pengelolaan ruang kelas pintar berbasis IoT. Aplikasi digunakan oleh dua role: `ADMIN` dan `PETUGAS`.
+
+## Tech stack
+- Mobile: Flutter + Dart.
+- Backend: Spring Boot, Java 21.
+- Database: MySQL, database `db_smart_class`.
+- Authentication: JWT access token + refresh token yang dikelola backend.
+- Token storage di Flutter: `flutter_secure_storage`.
+- HTTP client: package `http`, kecuali project sudah menggunakan client lain secara konsisten.
+- Backend berjalan di port `8081`.
+
+## Aturan sistem yang tidak boleh dilanggar
+1. Role resmi hanya `ADMIN` dan `PETUGAS`. Jangan membuat role `STUDENT`, `LECTURER`, `OFFICER`, atau nama role lain.
+2. Role berasal dari backend/database dan claim JWT. Jangan menentukan role berdasarkan `id_user`, email tertentu, nama user, atau input form.
+3. Registrasi umum menggunakan `POST /api/auth/register` dan backend menetapkan role baru sebagai `PETUGAS`. Jangan menambahkan pilihan role pada halaman register.
+4. Akun `ADMIN` dibuat/dikelola secara internal oleh admin sistem untuk saat ini. Jangan membuat registrasi publik sebagai ADMIN.
+5. Tidak menggunakan Login Google pada planning saat ini. Jangan menambahkan Google Sign-In, OAuth Google, atau tombol login Google yang berfungsi kecuali diminta secara eksplisit.
+6. Satu aplikasi Flutter melayani kedua role. Setelah login, tampilkan area/dashboard yang sesuai dengan role.
+7. Backend tetap menjadi sumber kebenaran untuk autentikasi dan otorisasi. Menyembunyikan tombol di Flutter bukan pengganti aturan keamanan backend.
+8. Jangan menampilkan identitas teknis controller IoT, seperti `SMARTCLASS-ESP-001`, di UI.
+9. Jangan menambahkan fitur, endpoint, tabel, field database, role, atau alur yang belum ada tanpa menjelaskan kebutuhan dan meminta persetujuan terlebih dahulu.
+10. Jangan mengubah kode backend dari task UI Flutter kecuali pengguna secara eksplisit meminta perubahan backend.
+
+## Fitur per role
+
+### ADMIN
+- Melihat dashboard dan status ruang/perangkat.
+- Melihat detail ruang dan perangkat.
+- Mengelola data ruang, perangkat, jadwal, dan pengguna sesuai endpoint backend.
+- Mengubah mode ruang AUTO/MANUAL sesuai aturan backend.
+- Melihat riwayat aktivitas dan log yang tersedia.
+- Tidak boleh mengandalkan UI saja untuk pembatasan akses; backend harus tetap memvalidasi role.
+
+### PETUGAS
+- Melihat dashboard, ruang, status perangkat, dan jadwal.
+- Mengontrol perangkat secara manual sesuai izin backend.
+- Mengubah mode ruang AUTO/MANUAL jika endpoint dan kebijakan backend mengizinkan.
+- Melihat riwayat aktivitas/log yang tersedia.
+- Tidak menampilkan menu CRUD pengguna, ruang, perangkat, atau pengelolaan jadwal yang khusus ADMIN.
+
+## Aturan AUTO dan MANUAL
+- `AUTO`: keputusan kontrol mengikuti aturan backend yang menggunakan jadwal dan hasil sensor/deteksi.
+- `MANUAL`: kontrol perangkat dilakukan oleh pengguna yang berwenang; deteksi tidak boleh diam-diam mengubah perangkat saat mode MANUAL.
+- Flutter hanya mengirim perintah dan menampilkan status dari backend. Jangan menanamkan business logic kontrol IoT di widget UI.
+
+## Alur kerja coding dengan Cursor
+1. Sebelum mengubah kode, periksa file, struktur, package, dan pola yang sudah ada.
+2. Ubah hanya file yang diperlukan untuk task. Hindari refactor besar yang tidak diminta.
+3. Pertahankan nama endpoint, field JSON, enum, dan tipe data sesuai backend yang ada.
+4. Jangan mengarang respons API. Jika kontrak endpoint belum jelas, minta kode controller/DTO atau respons Postman yang aktual.
+5. Jangan menghapus komentar/pseudocode yang dibuat pengguna tanpa alasan. Pertahankan komentar yang masih relevan dan perbarui bila alurnya berubah.
+6. Setelah perubahan, jelaskan file yang diubah, alasan, perintah untuk menjalankan/analyze, dan cara mengetesnya.
+7. Jangan menyatakan fitur berhasil sebelum pengguna menjalankan dan mengonfirmasi hasilnya.

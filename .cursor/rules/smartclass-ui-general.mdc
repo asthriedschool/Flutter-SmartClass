@@ -1,0 +1,71 @@
+---
+description: Aturan UI/UX umum untuk seluruh halaman Flutter Smart Class.
+globs: lib/screens/**/*.dart, lib/widgets/**/*.dart
+alwaysApply: false
+---
+
+# Smart Class — General UI/UX Rules
+
+## Tujuan
+Bangun UI mobile Smart Class yang profesional, konsisten, mudah digunakan, dan sesuai fungsi sistem monitoring/pengelolaan kelas pintar. Aturan ini berlaku umum; aturan khusus suatu halaman pada file `.mdc` lain dapat menambahkan detail, tetapi tidak boleh melanggar aturan sistem utama.
+
+## Arah visual
+- Pertahankan identitas visual Smart Class: navy/biru, putih, charcoal/abu gelap, dan aksen biru terang.
+- Gunakan gaya modern, profesional, bersih, dan sesuai konteks kampus/IoT.
+- Pertahankan desain yang sudah disetujui pengguna. Jangan mendesain ulang seluruh aplikasi tanpa diminta.
+- Utamakan konsistensi antarhalaman: warna, typography, radius, spacing, field, tombol, ikon, dan feedback.
+- Hindari dekorasi, animasi, gradient, atau shadow berlebihan yang tidak ada pada arah desain.
+- Gunakan aset lokal project bila tersedia; jangan mengganti logo/ikon/gambar lokal dengan gambar internet atau ikon generik tanpa alasan dan persetujuan.
+
+## Warna referensi
+Utamakan ThemeData, design tokens, atau konstanta warna bersama yang sudah ada. Jika belum ada, gunakan palet awal berikut secara konsisten:
+- Navy: `#114480`
+- Primary blue: `#0069FD`
+- Background gelap: `#050607`
+- Card charcoal: `#272829`
+- Input charcoal: `#454748`
+- Text primary pada permukaan gelap: `#FFFFFF`
+- Text secondary pada permukaan gelap: `#C5C8CE`
+Jangan mendefinisikan ulang warna yang sama di banyak file jika sudah tersedia di theme/constants.
+
+## Layout dan responsivitas
+- Desain mobile-first; perhatikan ukuran layar kecil dan keyboard yang terbuka.
+- Hindari overflow horizontal/vertical. Gunakan scrolling secara tepat dan aman terhadap notch/status bar.
+- Jangan mengunci ukuran widget secara berlebihan; gunakan constraints, Expanded/Flexible, SafeArea, dan SingleChildScrollView sesuai kebutuhan.
+- Jaga area sentuh tombol/ikon cukup besar dan mudah digunakan.
+- Jangan menaruh terlalu banyak informasi dalam satu kartu.
+- Pertahankan hierarchy visual: judul, deskripsi, label, input, aksi utama, dan aksi sekunder.
+
+## Komponen dan state
+- Gunakan widget reusable jika mengurangi duplikasi nyata; jangan memecah setiap widget kecil menjadi file baru tanpa kebutuhan.
+- Setiap request async yang relevan harus memiliki loading, success/error, dan empty state bila sesuai.
+- Nonaktifkan tombol submit selama request berjalan untuk mencegah submit ganda.
+- Pesan error harus singkat, ramah, dan tidak menampilkan stack trace, SQL, secret, token, atau hash password.
+- Field harus mempunyai label yang jelas; jangan hanya mengandalkan placeholder.
+- Tombol utama dan tombol sekunder harus punya hierarchy visual yang jelas.
+- Ikon harus konsisten gaya dan ukurannya.
+
+## Aksesibilitas
+- Gunakan kontras teks yang memadai.
+- Jangan menyampaikan status hanya dengan warna; sertakan teks/ikon.
+- Gunakan semantic labels/tooltips untuk kontrol ikon yang penting.
+- Pastikan teks dapat dibaca pada ukuran layar berbeda.
+
+## Batasan sistem Smart Class
+- Role resmi hanya `ADMIN` dan `PETUGAS`.
+- Jangan menambahkan Login Google/OAuth Google pada planning saat ini.
+- Registrasi umum menghasilkan `PETUGAS`; jangan tampilkan pilihan role pada halaman register.
+- Jangan menampilkan ringkasan Human Detection di Home/Dashboard.
+- Jangan menampilkan ID controller IoT seperti `SMARTCLASS-ESP-001` di UI.
+- Jangan mengarang status, jadwal, jumlah perangkat, atau data API. Tampilkan loading/empty/error state jika data belum tersedia.
+- Jangan membuat tombol/tautan terlihat berfungsi jika backend atau alur fitur belum tersedia.
+- Backend tetap menjadi sumber kebenaran untuk autentikasi, role, dan izin endpoint.
+
+## Workflow Cursor
+1. Periksa kode, theme, widget reusable, dan aset yang sudah ada sebelum mengubah UI.
+2. Terapkan aturan khusus halaman bila tersedia.
+3. Ubah file seminimal mungkin dan pertahankan struktur/nama yang sudah ada.
+4. Jangan menambahkan package baru tanpa memeriksa dependency dan menjelaskan alasannya.
+5. Jangan menghapus fungsi yang sudah berjalan hanya demi perubahan visual.
+6. Setelah mengubah kode, jalankan `dart format` pada file terkait dan `flutter analyze`.
+7. Laporkan file yang diubah dan cara pengujian manual; jangan mengklaim berhasil sebelum hasil test diketahui.

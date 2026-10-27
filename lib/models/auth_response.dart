@@ -11,14 +11,13 @@ class AuthResponse {
     required this.expiresInSeconds,
   });
 
-  factory AuthResponse.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
-      accessToken: json['accessToken'],
-      refreshToken: json['refreshToken'],
-      tokenType: json['tokenType'],
-      expiresInSeconds: json['expiresInSeconds'],
+      accessToken: json['accessToken'] as String,
+      refreshToken: json['refreshToken'] as String,
+      tokenType: json['tokenType'] as String,
+      expiresInSeconds: (json['expiresInSeconds'] as num)
+          .toInt(),
     );
   }
 }

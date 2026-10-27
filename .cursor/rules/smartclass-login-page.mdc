@@ -1,0 +1,77 @@
+---
+description: Aturan khusus desain dan perilaku Login Page Smart Class.
+globs: lib/screens/login/**/*.dart
+alwaysApply: false
+---
+
+# Smart Class — Login Page Rules
+
+## Referensi desain yang harus dipertahankan
+Gunakan screenshot login Smart Class yang diberikan pengguna sebagai acuan visual. Jangan mengganti arah desain tanpa diminta.
+
+Ciri-ciri desain:
+1. Bagian atas menampilkan foto ruang kelas dengan overlay biru/cyan transparan.
+2. Logo SmartClass berwarna putih dan wordmark berada di atas foto.
+3. Di bawah logo ada teks singkat: `Sistem Monitoring dan Pengelolaan Kelas Pintar`.
+4. Card form berwarna charcoal gelap, sudut atas sangat membulat, dan terlihat menyatu/bertumpuk dengan hero foto.
+5. Judul `Selamat Datang` dan deskripsi singkat berada di tengah card.
+6. Input email dan password berwarna abu-abu gelap, dengan ikon di sisi kiri.
+7. Password memiliki tombol tampil/sembunyikan.
+8. Tautan `Lupa password?` berada dekat field password.
+9. Tombol utama biru terang dengan ikon masuk dan label `Login`.
+10. Di bawah tombol ada divider dengan teks `atau`.
+11. Bagian bawah menampilkan ajakan `Belum punya akun?` dan `Daftar sebagai petugas`, dengan ikon registrasi dan panah.
+12. Latar bawah menggunakan hitam/gelap. Pastikan seluruh layar tetap nyaman discroll dan tidak overflow pada perangkat kecil.
+
+## Aset lokal yang disediakan pengguna
+Cari dan gunakan aset yang sudah ada di folder berikut, dengan memperhatikan kapitalisasi nama file:
+
+`assets/asset_login_page/`
+
+Daftar aset:
+- `FotoKelas.png` — foto hero ruang kelas.
+- `LogoSmartClass.svg` — logo SmartClass.
+- `Email.svg` — ikon email.
+- `Password.svg` — ikon password.
+- `Blind.svg` — ikon kontrol visibilitas password jika sesuai desain.
+- `Enter.svg` — ikon pada tombol Login.
+- `Add User Male.svg` — ikon pendaftaran petugas.
+- `Arrow.svg` — ikon panah untuk tautan pendaftaran.
+
+Aturan aset:
+- Gunakan aset lokal di atas; jangan mencari ulang aset dari internet atau menggantinya dengan ikon generik.
+- Periksa `pubspec.yaml` untuk memastikan folder aset terdaftar. Jika belum terdaftar, usulkan/perbaiki deklarasi aset secara minimal.
+- Untuk SVG, periksa apakah project sudah memiliki package `flutter_svg`. Jika belum, jelaskan bahwa dependency itu dibutuhkan dan minta persetujuan sebelum menambahkannya; jangan diam-diam mengganti SVG dengan ikon berbeda.
+- Periksa ejaan nama file persis. Nama `Add User Male.svg` mengandung spasi.
+- Jangan memindahkan atau mengganti nama aset tanpa persetujuan.
+- Jika asset gagal dimuat, jangan menyembunyikan error dengan mengganti aset secara diam-diam; periksa path dan konfigurasi aset.
+
+## Form dan interaksi
+- Field: email dan password.
+- Validasi email kosong/format tidak valid serta password kosong sebelum request dikirim.
+- Tampilkan loading pada tombol Login saat request berlangsung dan cegah submit berulang.
+- Pesan error login harus jelas dan aman; jangan tampilkan token, password, stack trace, atau detail database.
+- Gunakan `POST /api/auth/login` melalui `AuthService` yang sudah ada.
+- Request body harus mengikuti kontrak backend: `email` dan `password`.
+- Pada sukses, simpan `accessToken` dan `refreshToken` melalui `TokenStorage`/mekanisme secure storage yang sudah ada.
+- Role yang valid hanya `ADMIN` dan `PETUGAS`. Gunakan role dari respons/claim JWT untuk menentukan tampilan awal; jangan menentukan role dari `id_user`, email, atau input pengguna.
+- Decoding payload JWT di Flutter hanya untuk membaca claim UI, bukan untuk memverifikasi tanda tangan. Backend tetap memvalidasi JWT dan role.
+- Jangan log token, password, atau response sensitif.
+
+## Lupa password
+- Pertahankan posisi dan gaya visual tautan seperti referensi.
+- Sebelum membuat aksi, periksa apakah backend sudah menyediakan endpoint/alur reset password.
+- Jika belum ada endpoint, jangan mengarang endpoint, jangan menampilkan pesan sukses palsu, dan jangan membuat flow reset yang seolah berfungsi. Laporkan bahwa backend reset password belum tersedia dan minta keputusan pengguna apakah tautan disembunyikan atau ditampilkan sebagai fitur belum tersedia.
+
+## Pendaftaran
+- Tautan `Daftar sebagai petugas` membuka halaman register yang memang ada di project.
+- Registrasi umum memakai endpoint `POST /api/auth/register` dan field sesuai backend: `fullName`, `email`, `password`.
+- Jangan menambahkan pilihan role di halaman register; backend menetapkan role baru sebagai `PETUGAS`.
+- Jika halaman register belum ada, jangan membuat navigasi ke route yang belum tersedia. Beri tahu pengguna atau buat halaman hanya jika diminta.
+
+## Jangan ditambahkan ke Login Page
+- Tidak ada Login Google atau OAuth Google pada planning saat ini.
+- Jangan tambahkan login media sosial lain.
+- Jangan tambahkan pilihan ADMIN/PETUGAS di form login.
+- Jangan menambahkan kredensial uji hardcoded.
+- Jangan membuat dashboard tiruan sebagai tujuan login permanen; gunakan halaman tujuan yang sudah ada atau beri tahu jika dashboard belum dibuat.
