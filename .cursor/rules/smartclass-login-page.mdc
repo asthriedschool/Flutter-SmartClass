@@ -69,6 +69,26 @@ Aturan aset:
 - Jangan menambahkan pilihan role di halaman register; backend menetapkan role baru sebagai `PETUGAS`.
 - Jika halaman register belum ada, jangan membuat navigasi ke route yang belum tersedia. Beri tahu pengguna atau buat halaman hanya jika diminta.
 
+## Struktur Login Page dengan Atomic Design
+
+Saat merapikan Login Page, gunakan Atomic Design dengan batas tanggung jawab berikut:
+
+- **Atoms**: `AssetImage`/widget pemuat aset lokal. Pertahankan dukungan aset yang digunakan saat ini, termasuk SVG dan mekanisme aset khusus yang sudah ada; jangan mengganti aset dengan ikon generik.
+- **Molecules**: `LoginField` untuk email/password dan komponen divider berlabel bila memang diperlukan. Komponen menerima controller, label, hint, status enabled, error, suffix, dan callback lewat parameter.
+- **Organisms**: `LoginHero`, bagian form/kartu login, dan prompt pendaftaran petugas. Organisms bertanggung jawab pada bagian UI yang utuh, bukan pemanggilan API.
+- **Template**: layout responsif yang menyusun hero kelas dan kartu login bertumpuk, termasuk perilaku scroll/keyboard agar tampilan tetap sesuai referensi.
+- **Page (`LoginScreen`)**: tetap menjadi titik orkestrasi halaman. Pertahankan state dan perilaku yang ada, termasuk controller, `dispose`, validasi, loading, error, toggle password, pemanggilan `AuthService`, pembacaan role JWT, logout jika role tidak dikenali, dan navigasi ke `AdminDashboard` atau `PetugasDashboard`.
+
+Ketentuan refactor:
+1. Baca dan pahami `login_screen.dart` sebelum memindahkan kode. Refactor file yang ada, jangan membuat Login Page kedua.
+2. Pertahankan tampilan berdasarkan screenshot yang disetujui. Refactor ini adalah penataan kode, bukan redesign.
+3. Pindahkan komponen yang layak ke folder Atomic Design yang sesuai. Hindari membuat file baru untuk setiap widget `Text`, `SizedBox`, atau `Row`.
+4. Jaga komponen presentasi tetap dapat digunakan kembali dengan menerima data dan callback dari page. Jangan letakkan request HTTP, parsing role, atau navigasi autentikasi di atoms, molecules, organisms, atau template.
+5. Pertahankan `AuthService`, model respons, secure token storage, nama/path aset, validasi, pesan error, loading state, dan navigasi role yang telah ada.
+6. Jangan mengubah backend, endpoint, dependency, desain visual, atau fitur lain kecuali diperlukan dan dijelaskan. Jangan menambahkan fitur baru saat refactor.
+7. Pastikan `main.dart` dan jalur navigasi yang sudah ada tetap bekerja. Perbarui import sesuai lokasi baru dan hapus hanya kode/import yang benar-benar tidak lagi digunakan.
+8. Setelah selesai, jalankan `dart format` pada file yang berubah dan `flutter analyze`. Laporkan struktur file baru, tanggung jawab setiap lapisan, dan hasil pemeriksaan; jangan mengklaim pemeriksaan lolos jika belum dijalankan.
+
 ## Jangan ditambahkan ke Login Page
 - Tidak ada Login Google atau OAuth Google pada planning saat ini.
 - Jangan tambahkan login media sosial lain.

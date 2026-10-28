@@ -62,6 +62,11 @@ flutter:
 
   assets:
     - assets/asset_login_page/
+    - assets/asset_beranda_page/
+    - assets/asset_navbar/home/
+    - assets/asset_navbar/room/
+    - assets/asset_navbar/schedule/
+    - assets/asset_navbar/profile/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
