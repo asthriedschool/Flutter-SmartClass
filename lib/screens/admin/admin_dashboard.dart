@@ -17,6 +17,7 @@ import '../../storage/token_storage.dart';
 import '../login/login_screen.dart';
 import 'admin_home_data.dart';
 import 'manage_room_screen.dart';
+import 'room_page.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -123,6 +124,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  Future<void> _openRoomPage() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const RoomPage(),
+      ),
+    );
+    if (mounted) {
+      await _load();
+    }
+  }
+
   Future<void> _openManageRoom() async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -144,7 +156,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   void _onNavSelected(int index) {
     if (index == 1) {
-      _openManageRoom();
+      _openRoomPage();
       return;
     }
     const unavailable = <int, String>{

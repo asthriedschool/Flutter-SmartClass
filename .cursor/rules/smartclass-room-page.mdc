@@ -1,0 +1,140 @@
+---
+description: Aturan UI dan perilaku khusus Room Page untuk monitoring ruangan SmartClass.
+globs: lib/screens/**/*room*.dart, lib/screens/**/*Room*.dart
+alwaysApply: false
+---
+
+# SmartClass — Room Page Rules
+
+## Tujuan dan batas cakupan
+Aturan ini khusus untuk **Room Page**, yaitu halaman monitoring ruangan yang dibuka saat pengguna memilih menu **Room** pada bottom navigation utama. Gunakan screenshot Room yang diberikan pengguna sebagai acuan visual.
+
+**Room Page bukan Manage Room.**
+- Bottom navigation menu `Room` harus membuka Room Page ini.
+- Tombol `Manage Room` di header Room Page membuka halaman Manage Room untuk administrasi data ruangan (tambah, edit, hapus, dan pengelolaan status) sesuai implementasi yang sudah tersedia.
+- Jangan mengarahkan item `Room` di bottom navigation langsung ke Manage Room.
+- Jangan mencampur fungsi monitoring Room Page dengan CRUD Manage Room menjadi satu halaman.
+
+Aturan ini berlaku untuk UI role `ADMIN` terlebih dahulu sesuai alur project saat ini. Jangan mengubah alur autentikasi atau Dashboard Petugas.
+
+## Arah visual
+- Ikuti screenshot Room Page: dark mode, latar hampir hitam (`#050607`), gradient navy/teal lembut pada bagian atas, teks putih, teks sekunder abu-abu, dan aksen biru/cyan.
+- Pertahankan komposisi: status bar/safe area, judul `Room`, subtitle `Monitor all smart classroom`, tombol `Manage Room`, search field, filter chips, ringkasan jumlah ruangan, daftar kartu ruangan, dan bottom navigation.
+- Kartu ruangan memakai foto kelas sebagai latar, lapisan overlay biru gelap agar teks tetap terbaca, sudut membulat, dan informasi yang tersusun ringkas.
+- Gunakan foto/aset lokal yang tersedia di `assets/asset_beranda_page/` atau folder aset yang relevan. Periksa aset aktual terlebih dahulu; jangan mengambil gambar dari internet atau membuat nama path aset yang belum ada.
+- Gunakan theme, color tokens, typography, spacing, dan komponen bersama yang sudah tersedia. Hindari mendefinisikan ulang style yang sama di banyak file.
+- Jangan melakukan redesign besar yang menyimpang dari screenshot.
+
+## Struktur dan komponen halaman
+Susun halaman sebagai konten vertikal yang dapat discroll. Pastikan bottom navigation tidak menutupi konten.
+
+### 1. Header
+- Tampilkan judul `Room` dengan hierarki visual utama.
+- Tampilkan subtitle singkat `Monitor all smart classroom` atau teks sepadan.
+- Tampilkan tombol `Manage Room` di sisi kanan dengan ikon pengaturan jika ikon/aset sesuai tersedia.
+- Tombol `Manage Room` membuka halaman Manage Room yang sudah ada. Periksa route/navigasi aktual sebelum menghubungkannya; jangan membuat halaman duplikat atau route palsu.
+
+### 2. Pencarian
+- Sediakan search field dengan ikon pencarian dan hint `Search Room...`.
+- Pencarian harus memfilter daftar ruangan yang sudah dimuat berdasarkan nama ruangan dan field lokasi (gedung/lantai) bila tersedia.
+- Perbarui hasil pencarian secara konsisten saat teks berubah. Jangan mengirim request API pada setiap ketikan tanpa kebutuhan.
+- Sediakan cara menghapus teks pencarian bila sesuai pola UI project.
+
+### 3. Filter chips
+Tampilkan lima filter seperti screenshot:
+- `All`
+- `Auto`
+- `Manual`
+- `Active`
+- `Inactive`
+
+Ketentuan:
+- Hanya satu filter aktif pada satu waktu.
+- Filter aktif memakai border/aksen biru-cyan; filter lain memakai permukaan gelap dan border halus.
+- Filter benar-benar memengaruhi daftar yang ditampilkan berdasarkan field aktual dari model/API.
+- `Auto` dan `Manual` memfilter operation mode; `Active` dan `Inactive` memfilter status ruangan/sistem sesuai definisi backend. Jangan mengasumsikan `system_status` dan `operation_mode` adalah field yang sama.
+- `All` menghapus filter tambahan, tetapi pencarian teks yang sedang aktif boleh tetap diterapkan.
+- Jangan menampilkan nilai filter atau status yang tidak didukung model/backend.
+
+### 4. Ringkasan ruangan
+Tampilkan kartu ringkasan horizontal seperti screenshot dengan:
+- Total `Rooms`
+- `Active`
+- `Inactive`
+
+Nilai harus dihitung dari data aktual yang tersedia dan konsisten dengan definisi status backend. Jangan hardcode angka contoh dari screenshot. Jika status ruangan belum tersedia, tampilkan total ruangan saja atau gunakan fallback yang jujur; jangan menebak jumlah Active/Inactive.
+
+### 5. Kartu Room
+Setiap kartu menampilkan informasi aktual yang tersedia, dengan prioritas:
+- Nama ruangan.
+- Mode `AUTO MODE` atau `MANUAL` sesuai field operation mode.
+- Status aktif/nonaktif dengan indikator visual dan label teks.
+- Jumlah perangkat ON dan total perangkat jika relasi atau endpoint mendukung perhitungan tersebut.
+- Jadwal saat ini/berikutnya jika endpoint dan data jadwal tersedia.
+- Tombol chevron untuk membuka detail ruangan hanya jika halaman detail benar-benar tersedia.
+- Kartu dapat memakai foto ruangan dengan overlay biru. Gunakan foto milik ruangan jika field foto tersedia; bila tidak, gunakan aset fallback lokal yang memang tersedia, bukan URL atau path rekaan.
+
+Jangan mengarang nama ruangan, jumlah perangkat, jadwal, persentase, atau status untuk membuat kartu tampak penuh. Tampilkan hanya field yang tersedia.
+
+### 6. Kontrol perangkat di kartu
+- Screenshot referensi memperlihatkan kontrol cepat perangkat pada kartu ber-mode manual. Implementasikan kontrol semacam ini hanya jika model, service, endpoint perintah perangkat, dan aturan akses backend benar-benar mendukungnya.
+- Periksa kontrak API dan pola pemanggilan `DeviceCommand` yang sudah ada sebelum menghubungkan tombol.
+- Jika kontrol manual belum didukung atau endpoint/izin belum jelas, jangan membuat tombol yang terlihat aktif tetapi tidak bekerja. Tampilkan informasi mode dan status yang tersedia, lalu laporkan kontrol yang belum dapat diintegrasikan.
+- Untuk aksi yang mengirim perintah, tampilkan loading/disabled state selama request dan feedback berhasil/gagal. Jangan mengklaim perangkat fisik berubah hanya karena request dikirim; gunakan respons/status backend yang tersedia.
+- Jangan mengizinkan kontrol manual saat ruangan menggunakan mode Auto kecuali backend secara eksplisit mendukungnya.
+
+## Bottom navigation dan alur navigasi
+- Room Page adalah tujuan utama menu `Room` di bottom navigation.
+- Saat Room Page tampil, menu `Room` harus menjadi menu aktif menggunakan aset yang tersedia di `assets/asset_navbar/room/`, khususnya `room_active.png` jika file tersebut memang ada. Saat menu tidak aktif, gunakan `room_inactive.svg`.
+- Periksa nama dan ekstensi aset aktual sebelum menggunakannya. Gunakan `Image.asset` untuk PNG dan `flutter_svg` untuk SVG.
+- Gunakan komponen bottom navigation reusable yang sudah ada jika tersedia. Jangan membuat Navbar kedua atau mengimplementasikan ulang animasi pada Room Page.
+- Bottom navigation harus mempertahankan pilihan menu aktif berdasarkan halaman saat ini dan mengikuti navigasi utama project.
+- Tombol `Manage Room` di header merupakan jalur terpisah menuju halaman administrasi. Jika Manage Room dibuka melalui tombol itu, jangan salah menganggap halaman tersebut sebagai tujuan langsung menu `Room` di navbar; ikuti shell/navigation pattern project yang sudah ada.
+- Jika halaman tujuan menu lain belum tersedia, jangan membuat navigasi palsu. Laporkan bagian yang belum ada.
+
+## Atomic Design dan struktur kode
+Terapkan Atomic Design secara praktis sesuai aturan UI general:
+- **Atoms**: ikon aset, label status, indikator titik status, dan tombol ikon dasar bila reusable.
+- **Molecules**: search field, filter chip, ringkasan statistik kecil, atau baris informasi ruangan.
+- **Organisms**: header Room, ringkasan ruangan, dan kartu Room.
+- **Templates**: susunan layout Room Page yang mengatur background, safe area, scrolling, dan slot bottom navigation.
+- **Page**: Room Page yang mengatur state filter/search, mengambil data melalui service, serta menghubungkan aksi navigasi.
+
+Pedoman:
+- Periksa struktur project dan widget shared sebelum membuat file baru.
+- Gunakan kembali komponen yang sesuai dan hindari duplikasi kode.
+- Jangan memecah setiap `Text`, `Padding`, `Row`, atau widget kecil menjadi file terpisah tanpa manfaat nyata.
+- Widget presentasi menerima data dan callback; jangan menaruh request HTTP langsung pada room card.
+- Ikuti konvensi folder dan penamaan yang sudah dipakai project. Jangan memindahkan file lain yang tidak terkait.
+
+## Integrasi backend dan keamanan
+- Sebelum coding, periksa endpoint, service, model/DTO, dan kontrak respons aktual untuk rooms, devices, schedules, serta device commands bila diperlukan.
+- Gunakan service/API client yang sudah ada; jangan membuat request HTTP berulang dari tiap kartu.
+- Jangan mengarang endpoint, field, enum, payload, jumlah perangkat, atau jadwal.
+- Hormati role `ADMIN` dan `PETUGAS` serta otorisasi backend. Menyembunyikan tombol di UI bukan pengganti pemeriksaan izin server.
+- Jangan mengubah backend, skema database, autentikasi JWT, Login Page, atau Dashboard Petugas untuk menyelesaikan Room Page kecuali diminta secara eksplisit.
+- Jangan menampilkan ID controller IoT seperti `SMARTCLASS-ESP-001` kepada pengguna.
+- Jangan menambahkan fitur Human Detection atau menampilkan persentase/label `Human Detection`, karena fitur tersebut bukan bagian dari scope aplikasi saat ini meskipun muncul di screenshot referensi.
+
+## Loading, empty, dan error states
+- Tampilkan loading state yang sesuai tema saat data sedang dimuat.
+- Jika belum ada ruangan, tampilkan empty state yang jelas dan ramah.
+- Jika pencarian/filter tidak menghasilkan data, tampilkan pesan seperti `No rooms found`.
+- Jika API gagal, tampilkan pesan singkat dan tombol retry bila sesuai.
+- Jangan mengganti kegagalan API dengan data dummy.
+- Hindari menampilkan stack trace, SQL, token, hash password, atau detail sensitif.
+
+## Responsivitas dan validasi
+- Gunakan safe area dan scroll yang benar; perhatikan status bar dan bottom system navigation Android.
+- Pastikan search, filter chips, summary card, room cards, serta bottom navigation tidak overflow pada layar kecil.
+- Filter chips boleh menggunakan scroll horizontal bila ruang layar tidak cukup.
+- Pastikan teks pada background foto tetap terbaca dengan overlay yang memadai.
+- Status harus memiliki label teks, bukan hanya warna.
+- Kontrol ikon penting harus memiliki tooltip/semantic label.
+
+## Batasan scope dan penyelesaian
+- Fokus hanya pada Room Page monitoring dan integrasinya dengan navigasi utama.
+- Jangan mengimplementasikan ulang halaman Manage Room, Add Room, Edit Room, atau animasi bottom navigation sebagai bagian dari pekerjaan ini.
+- Jangan mengubah Login Page atau autentikasi yang sudah berjalan.
+- Setelah implementasi, jalankan `dart format` pada file yang berubah dan `flutter analyze`; perbaiki error yang ditimbulkan.
+- Laporkan file yang dibuat/diubah, endpoint yang benar-benar digunakan, filter/aksi yang berfungsi, dan bagian yang belum tersedia. Jangan mengklaim pengujian berhasil jika belum dijalankan.

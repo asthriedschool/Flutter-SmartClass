@@ -33,6 +33,7 @@ class ManageRoomTemplate extends StatelessWidget {
     required this.onDelete,
     required this.onToggleStatus,
     required this.onNavSelected,
+    this.navIndex = -1,
   });
 
   final TextEditingController searchController;
@@ -57,6 +58,7 @@ class ManageRoomTemplate extends StatelessWidget {
   final ValueChanged<Room> onDelete;
   final ValueChanged<Room> onToggleStatus;
   final ValueChanged<int> onNavSelected;
+  final int navIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +115,7 @@ class ManageRoomTemplate extends StatelessWidget {
             ),
           ),
           SmartBottomNav(
-            currentIndex: 1,
+            currentIndex: navIndex,
             items: adminBottomNavItems,
             onSelected: onNavSelected,
           ),

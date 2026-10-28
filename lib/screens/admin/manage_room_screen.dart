@@ -9,9 +9,15 @@ import '../../services/room_service.dart';
 import '../../shared/widgets/templates/manage_room_template.dart';
 import '../login/login_screen.dart';
 import 'room_form_screen.dart';
+import 'room_page.dart';
 
 class ManageRoomScreen extends StatefulWidget {
-  const ManageRoomScreen({super.key});
+  const ManageRoomScreen({
+    super.key,
+    this.openedFromRoomPage = false,
+  });
+
+  final bool openedFromRoomPage;
 
   @override
   State<ManageRoomScreen> createState() =>
@@ -276,6 +282,15 @@ class _ManageRoomScreenState
       return;
     }
     if (index == 1) {
+      if (widget.openedFromRoomPage) {
+        Navigator.of(context).pop();
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute<void>(
+            builder: (_) => const RoomPage(),
+          ),
+        );
+      }
       return;
     }
     const names = {2: 'Schedule', 3: 'Profile'};
