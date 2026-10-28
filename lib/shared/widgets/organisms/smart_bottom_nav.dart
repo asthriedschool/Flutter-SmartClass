@@ -15,6 +15,34 @@ class SmartNavItem {
   final String inactiveAsset;
 }
 
+const adminBottomNavItems = <SmartNavItem>[
+  SmartNavItem(
+    label: 'Home',
+    activeAsset: 'assets/asset_navbar/home/home_active.svg',
+    inactiveAsset:
+        'assets/asset_navbar/home/home_inactive.svg',
+  ),
+  SmartNavItem(
+    label: 'Room',
+    activeAsset: 'assets/asset_navbar/room/room_active.png',
+    inactiveAsset:
+        'assets/asset_navbar/room/room_inactive.svg',
+  ),
+  SmartNavItem(
+    label: 'Schedule',
+    activeAsset:
+        'assets/asset_navbar/schedule/schedule_active.png',
+    inactiveAsset: 'assets/asset_navbar/schedule/schedule_inactive.svg',
+  ),
+  SmartNavItem(
+    label: 'Account',
+    activeAsset:
+        'assets/asset_navbar/profile/profile_active.svg',
+    inactiveAsset:
+        'assets/asset_navbar/profile/profile_inactive.svg',
+  ),
+];
+
 class SmartBottomNav extends StatelessWidget {
   const SmartBottomNav({
     super.key,

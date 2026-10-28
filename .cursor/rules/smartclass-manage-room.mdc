@@ -1,0 +1,112 @@
+---
+description: Aturan UI dan perilaku khusus halaman Manage Room untuk Admin SmartClass.
+globs: lib/screens/admin/**/*room*.dart, lib/screens/admin/**/*manage_room*.dart
+alwaysApply: false
+---
+
+# SmartClass — Manage Room Page Rules
+
+## Tujuan dan cakupan
+Aturan ini berlaku untuk halaman **Manage Room** milik role `ADMIN` pada aplikasi Flutter SmartClass. Gunakan screenshot referensi Manage Room yang diberikan pengguna sebagai acuan visual. Halaman ini digunakan Admin untuk mencari, melihat, memfilter, menambah, mengedit, dan mengelola status ruangan sesuai kemampuan backend yang benar-benar tersedia.
+
+Aturan ini khusus untuk Manage Room. Jangan menerapkan layout ini ke Dashboard Petugas atau halaman manajemen lain.
+
+## Arah visual
+- Gunakan dark mode dengan latar hampir hitam (`#050607`), panel charcoal (`#242628`), teks putih, teks sekunder abu-abu, dan aksen biru/cyan sesuai identitas SmartClass.
+- Bagian atas boleh memakai gradient navy/teal lembut seperti screenshot; jangan menerapkan gradient berlebihan ke semua kartu.
+- Pertahankan komposisi visual screenshot: header Manage Room, tombol Add Room, subtitle singkat, kolom pencarian, filter status, jumlah hasil, dan daftar kartu ruangan.
+- Kartu ruangan memakai permukaan charcoal dengan sudut membulat, hierarki teks yang jelas, label status, informasi lokasi, ringkasan perangkat, serta tombol aksi yang ringkas.
+- Gunakan warna status secara konsisten, tetapi status tidak boleh disampaikan hanya dengan warna: selalu tampilkan label teks.
+- Utamakan ThemeData, warna, typography, dan komponen bersama yang sudah ada. Jangan membuat sistem desain duplikat.
+- Jangan melakukan redesign yang menyimpang dari screenshot tanpa alasan fungsional.
+
+## Struktur halaman
+Susun halaman secara vertikal dan izinkan konten daftar untuk discroll:
+
+1. **Header**
+   - Hormati status bar dan safe area Android; jangan menggambar status bar palsu.
+   - Tampilkan tombol kembali berbentuk lingkaran di sebelah kiri judul `Manage Room` jika pola navigasi project memang menggunakan tombol kembali pada halaman ini.
+   - Tampilkan tombol `Add Room` di sisi kanan jika fitur tambah ruangan tersedia.
+   - Subtitle singkat: `Add, edit, and organize smart classroom` atau teks sepadan yang konsisten dengan referensi.
+   - Tombol kembali harus kembali ke halaman asal yang benar, bukan mengarahkan ke halaman yang dikarang.
+
+2. **Pencarian ruangan**
+   - Sediakan search field dengan ikon pencarian dan hint `Search Room...`.
+   - Pencarian harus memfilter daftar yang telah dimuat berdasarkan nama ruangan dan, jika field tersedia, gedung/lokasi.
+   - Pencarian tidak boleh mengirim request API pada setiap ketikan tanpa kebutuhan. Gunakan data yang sudah tersedia atau pola pencarian yang sudah digunakan project.
+   - Sediakan aksi clear jika sesuai dengan pola UI project.
+
+3. **Filter status**
+   - Tampilkan pilihan `All`, `Enabled`, dan `Disabled` seperti screenshot.
+   - Hanya satu filter yang aktif pada satu waktu. Gaya filter aktif menggunakan aksen biru/cyan; filter lain memakai gaya gelap dengan border yang halus.
+   - Filter harus benar-benar mengubah daftar yang terlihat berdasarkan status ruangan dari model/API. Jangan menyamakan status ruangan dengan status perangkat kecuali definisi backend menyatakan demikian.
+   - Tampilkan jumlah ruangan sesuai hasil filter/search saat ini, bukan angka hardcode.
+
+4. **Daftar kartu ruangan**
+   Setiap kartu menampilkan hanya data yang benar-benar tersedia dari backend:
+   - Nama ruangan, misalnya format `GK 1 - LAB 503` sebagai contoh visual, bukan data produksi hardcode.
+   - Lokasi/gedung/lantai bila field tersedia.
+   - Label `System Status: Enabled` atau `System Status: Disabled` berdasarkan field status aktual.
+   - Jumlah perangkat terdaftar dan ringkasan kategori perangkat, misalnya lampu, AC, atau proyektor, hanya jika model/API memiliki data yang diperlukan.
+   - Jangan menghitung atau mengarang jumlah perangkat jika relasi atau endpoint yang diperlukan tidak tersedia.
+   - Jika jumlah perangkat tidak tersedia, tampilkan informasi ruangan yang memang ada tanpa membuat angka palsu.
+
+5. **Aksi kartu ruangan**
+   - `Edit`: buka halaman/form edit yang benar-benar tersedia dan kirim identitas ruangan yang diperlukan.
+   - `Delete`: tampilkan dialog konfirmasi sebelum penghapusan. Jalankan penghapusan hanya jika endpoint dan izin backend tersedia; setelah berhasil, perbarui daftar dan tampilkan feedback.
+   - `Disable Room` / `Enable Room`: label mengikuti status saat ini dan aksi hanya boleh tersedia jika backend memiliki operasi untuk mengubah status tersebut. Jangan menyimpulkan bahwa endpoint update generik dapat mengubah status tanpa memeriksa kontrak API.
+   - Jangan menampilkan tombol aktif yang tidak melakukan apa pun. Jika alur belum tersedia, laporkan dan jangan membuat navigasi atau endpoint palsu.
+   - Pastikan loading state mencegah aksi berulang selama request berlangsung.
+
+6. **Empty, loading, dan error states**
+   - Saat memuat data, tampilkan indikator loading yang sesuai dengan tema.
+   - Jika belum ada ruangan, tampilkan empty state yang ramah dengan pesan singkat; tampilkan tombol Add Room hanya jika fitur tambah tersedia.
+   - Jika pencarian/filter tidak menemukan hasil, tampilkan pesan seperti `No rooms found` dan sediakan cara menghapus pencarian/filter.
+   - Jika API gagal, tampilkan pesan ramah dan tombol coba lagi bila sesuai. Jangan menampilkan stack trace, SQL, token, atau detail sensitif.
+   - Jangan mengisi daftar dengan ruangan dummy agar UI terlihat penuh.
+
+## Bottom navigation dan aset Navbar
+- Halaman Manage Room merupakan bagian menu `Room`; bila bottom navigation ditampilkan pada shell/navigasi utama Admin, status menu `Room` harus aktif.
+- Ikuti komponen bottom navigation yang sudah ada. Jangan membuat Navbar kedua khusus halaman ini dan jangan menduplikasi state navigasi jika shell utama sudah mengelolanya.
+- Gunakan aset lokal yang tersedia di `assets/asset_navbar/room/`, khususnya `room_active.png` untuk menu aktif dan `room_inactive.svg` untuk keadaan tidak aktif. Periksa nama/format file aktual sebelum dipakai.
+- Aset ikon menu lain mengikuti struktur yang sudah ada di `assets/asset_navbar/` (home, schedule, profile). Jangan mengganti nama file, membuat duplikat, atau menghapus aset yang masih digunakan.
+- Jika bottom navigation belum diimplementasikan, jangan membuat animasinya sebagai bagian dari rule/pekerjaan Manage Room ini. Pastikan layout halaman mudah diintegrasikan ke Navbar reusable ketika Navbar dibuat.
+- Tombol kembali di header bukan pengganti bottom navigation; keduanya harus mengikuti pola navigasi project.
+
+## Atomic Design dan struktur kode
+Gunakan Atomic Design secara praktis sesuai aturan umum project:
+- **Atoms**: elemen dasar yang memang reusable, misalnya ikon aset, label status, atau tombol kecil.
+- **Molecules**: search field, filter chip, atau baris ringkasan perangkat.
+- **Organisms**: header Manage Room, filter/search section, dan room card.
+- **Templates**: susunan layout halaman yang mengatur safe area, background, scrolling, dan slot konten.
+- **Page**: halaman Manage Room yang menghubungkan state, service, filter, dan navigasi.
+
+Pedoman:
+- Periksa struktur project dan komponen yang sudah ada sebelum membuat file baru.
+- Gunakan kembali komponen shared yang cocok; jangan membuat duplikat untuk komponen yang sama.
+- Jangan memecah setiap `Text`, `Padding`, `Row`, atau widget kecil menjadi file sendiri tanpa manfaat nyata.
+- Komponen visual menerima data dan callback melalui parameter; jangan letakkan request HTTP atau aturan akses backend di widget atom/molecule.
+- Gunakan folder dan konvensi penamaan yang sudah dipakai project. Jangan memindahkan file lain yang tidak terkait hanya demi memenuhi struktur contoh.
+
+## Integrasi backend dan keamanan
+- Sebelum coding, periksa endpoint, service, model/DTO, repository, dan kontrak respons yang benar-benar tersedia untuk rooms dan devices.
+- Gunakan service/API client yang sudah ada. Jangan membuat request HTTP langsung dari setiap room card jika project sudah memiliki lapisan service.
+- Jangan mengarang endpoint, field respons, enum, atau payload. Sesuaikan implementasi dengan backend aktual dan role `ADMIN`.
+- Backend tetap menjadi sumber kebenaran untuk izin, status, dan perubahan data. Menyembunyikan tombol di UI saja tidak cukup sebagai kontrol akses.
+- Jangan mengubah backend, skema database, autentikasi JWT, Login Page, atau Dashboard Petugas untuk menyelesaikan halaman ini kecuali diminta secara eksplisit.
+- Jangan menampilkan ID controller IoT seperti `SMARTCLASS-ESP-001` kepada pengguna.
+- Jangan menampilkan fitur Human Detection atau data deteksi manusia.
+
+## Responsivitas dan aksesibilitas
+- Gunakan `SafeArea` dan scrolling vertikal yang benar.
+- Pastikan header, filter, tombol, dan kartu tidak overflow pada emulator Android ukuran kecil.
+- Bila filter terlalu lebar, gunakan layout yang responsif tanpa menghilangkan opsi filter.
+- Pastikan target sentuh tombol memadai dan kontrol ikon penting memiliki tooltip/semantic label.
+- Pertahankan kontras yang memadai pada dark mode dan dukung ukuran teks sistem sewajarnya.
+
+## Batasan scope dan validasi
+- Fokus hanya pada UI dan alur Manage Room untuk Admin.
+- Jangan membuat Dashboard Petugas, halaman Manage Device/Schedule/User, atau animasi bottom navigation sebagai bagian dari pekerjaan ini.
+- Jangan mengganti Login Page atau autentikasi yang sudah berjalan.
+- Setelah implementasi, jalankan `dart format` pada file yang berubah dan `flutter analyze`; perbaiki error yang ditimbulkan perubahan.
+- Laporkan file yang dibuat/diubah, endpoint yang benar-benar digunakan, aksi yang sudah berfungsi, dan fitur yang belum tersedia. Jangan mengklaim tes atau integrasi berhasil jika belum dijalankan.

@@ -16,6 +16,7 @@ import '../../shared/widgets/templates/admin_home_template.dart';
 import '../../storage/token_storage.dart';
 import '../login/login_screen.dart';
 import 'admin_home_data.dart';
+import 'manage_room_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -122,9 +123,31 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  Future<void> _openManageRoom() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const ManageRoomScreen(),
+      ),
+    );
+    if (mounted) {
+      await _load();
+    }
+  }
+
+  void _onQuickAccess(String pageName) {
+    if (pageName == 'kelola ruangan') {
+      _openManageRoom();
+      return;
+    }
+    _showUnavailable(pageName);
+  }
+
   void _onNavSelected(int index) {
+    if (index == 1) {
+      _openManageRoom();
+      return;
+    }
     const unavailable = <int, String>{
-      1: 'Room',
       2: 'Schedule',
       3: 'Profile',
     };
@@ -152,34 +175,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   _showUnavailable('notifikasi'),
               onRetry: _load,
               onLogin: _goToLogin,
-              onQuickAccess: _showUnavailable,
+              onQuickAccess: _onQuickAccess,
             ),
           ),
           SmartBottomNav(
             currentIndex: 0,
             onSelected: _onNavSelected,
-            items: const [
-              SmartNavItem(
-                label: 'Home',
-                activeAsset: 'assets/asset_navbar/home/home_active.svg',
-                inactiveAsset: 'assets/asset_navbar/home/home_inactive.svg',
-              ),
-              SmartNavItem(
-                label: 'Room',
-                activeAsset: 'assets/asset_navbar/room/room_active.png',
-                inactiveAsset: 'assets/asset_navbar/room/room_inactive.svg',
-              ),
-              SmartNavItem(
-                label: 'Schedule',
-                activeAsset: 'assets/asset_navbar/schedule/schedule_active.png',
-                inactiveAsset: 'assets/asset_navbar/schedule/schedule_inactive.svg',
-              ),
-              SmartNavItem(
-                label: 'Account',
-                activeAsset: 'assets/asset_navbar/profile/profile_active.svg',
-                inactiveAsset: 'assets/asset_navbar/profile/profile_inactive.svg',
-              ),
-            ],
+            items: adminBottomNavItems,
           ),
         ],
       ),
