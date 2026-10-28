@@ -75,6 +75,19 @@ class RoomService {
     );
   }
 
+  Future<Room> updateOperationMode({
+    required int idRoom,
+    required String operationMode,
+  }) async {
+    final json = await _apiClient.sendObject(
+      'PATCH',
+      '/rooms/$idRoom/mode',
+      query: {'operationMode': operationMode},
+      fallback: 'Mode ruangan gagal diubah.',
+    );
+    return Room.fromJson(json);
+  }
+
   Future<Room> updateSystemStatus({
     required int idRoom,
     required String systemStatus,
