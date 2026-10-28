@@ -61,6 +61,48 @@ Jangan mendefinisikan ulang warna yang sama di banyak file jika sudah tersedia d
 - Jangan membuat tombol/tautan terlihat berfungsi jika backend atau alur fitur belum tersedia.
 - Backend tetap menjadi sumber kebenaran untuk autentikasi, role, dan izin endpoint.
 
+## Atomic Design dan struktur komponen Flutter
+
+Gunakan pendekatan Atomic Design secara bertahap agar UI konsisten, mudah dirawat, dan komponen dapat digunakan kembali. Terapkan berdasarkan kebutuhan nyata; jangan memecah setiap `Text`, `Padding`, atau widget kecil menjadi file terpisah tanpa manfaat.
+
+Definisi dan tanggung jawab:
+- **Atoms**: elemen UI paling dasar, misalnya widget aset/logo, tombol dasar, ikon aset, atau field visual sederhana.
+- **Molecules**: gabungan beberapa atom untuk satu fungsi kecil, misalnya field email/password yang menggabungkan ikon, label, input, suffix action, dan pesan error.
+- **Organisms**: bagian UI yang lebih lengkap, misalnya hero login, kartu/form login, atau kartu ajakan registrasi.
+- **Templates**: mengatur susunan/layout halaman tanpa mengurus autentikasi atau aturan bisnis, misalnya layout hero di atas dan card login yang dapat discroll.
+- **Pages**: halaman yang menghubungkan template/organisms dengan state, callback, service, dan navigasi, misalnya `LoginScreen`.
+
+Struktur awal yang disarankan untuk mulai merapikan Login Page:
+```text
+lib/
+├── screens/
+│   └── login/
+│       └── login_screen.dart          # Page: state dan orkestrasi alur login
+└── shared/
+    └── widgets/
+        ├── atoms/
+        │   └── asset_image.dart
+        ├── molecules/
+        │   └── login_field.dart
+        ├── organisms/
+        │   ├── login_hero.dart
+        │   ├── login_form_card.dart
+        │   └── registration_prompt.dart
+        └── templates/
+            └── login_template.dart
+```
+
+Pedoman implementasi:
+- Gunakan struktur di atas sebagai panduan, bukan alasan untuk membuat file kosong atau abstraksi yang tidak diperlukan.
+- Pindahkan widget yang sudah ada ke lapisan yang tepat; hindari menduplikasi widget atau membuat versi kedua dari komponen yang sama.
+- Pisahkan presentasi dari proses bisnis. Page boleh mengelola state form, validasi, pemanggilan `AuthService`, dan navigasi; komponen visual menerima nilai, error, status loading, dan callback melalui parameter.
+- Template mengatur layout dan responsivitas, bukan memanggil API atau menentukan role pengguna.
+- Jangan menambahkan package state management baru hanya untuk refactor ini. Ikuti pola yang sudah digunakan project.
+- Pertahankan nama aset, path aset, warna, spacing, radius, tipografi, teks, layout, aksesibilitas, dan perilaku yang sudah disetujui kecuali perubahan memang diperlukan untuk refactor.
+- Jangan mengubah kontrak API, autentikasi, penyimpanan token, role `ADMIN`/`PETUGAS`, atau navigasi yang sudah berjalan.
+- Jangan membuat semua komponen bersifat generik jika hanya menambah kompleksitas. Ekstrak komponen bila punya tanggung jawab jelas atau berpotensi dipakai ulang.
+- Setelah refactor, periksa seluruh import dan referensi, jalankan `dart format` serta `flutter analyze`, dan perbaiki error yang ditimbulkan perubahan.
+
 ## Workflow Cursor
 1. Periksa kode, theme, widget reusable, dan aset yang sudah ada sebelum mengubah UI.
 2. Terapkan aturan khusus halaman bila tersedia.

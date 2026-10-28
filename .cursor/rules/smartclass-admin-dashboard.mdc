@@ -1,0 +1,96 @@
+---
+description: Aturan UI dan perilaku khusus Beranda/Dashboard Admin SmartClass.
+globs: lib/screens/admin/**/*dashboard*.dart, lib/screens/admin/**/*home*.dart, lib/screens/admin/**/*beranda*.dart
+alwaysApply: false
+---
+
+# SmartClass — Admin Dashboard / Beranda Rules
+
+## Tujuan
+Aturan ini berlaku saat membuat atau mengubah Beranda/Dashboard untuk role `ADMIN` pada aplikasi Flutter SmartClass. Gunakan screenshot referensi `Beranda.png` yang diberikan pengguna sebagai acuan visual. Jangan menerapkan layout ini ke Dashboard Petugas, karena dashboard Petugas akan dirancang terpisah.
+
+## Arah visual yang wajib dipertahankan
+- Dark mode dengan latar hampir hitam, panel charcoal, dan aksen biru/cyan.
+- Kesan modern, profesional, ringkas, dan cocok untuk aplikasi monitoring kelas serta kelistrikan berbasis IoT.
+- Bagian atas memiliki nuansa navy/teal atau cahaya biru yang lembut. Jangan menambahkan gradient berlebihan di semua komponen.
+- Kartu statistik memakai biru/cyan dengan sudut membulat dan teks putih yang kontras.
+- Kartu status dan aktivitas memakai charcoal dengan teks utama putih dan teks sekunder abu-abu.
+- Gunakan spacing yang konsisten, ikon sederhana, radius membulat, dan ukuran teks yang mudah dibaca pada layar ponsel.
+- Utamakan ThemeData, warna, typography, dan reusable widgets yang sudah ada di project. Jangan membuat sistem desain duplikat jika konstanta/theme bersama sudah tersedia.
+
+## Struktur konten dashboard
+Urutan vertikal mengikuti screenshot dan dapat discroll:
+
+1. **Header Admin**
+   - Tampilkan waktu/status bar menggunakan sistem Android; jangan membuat jam palsu di dalam halaman jika tidak diperlukan.
+   - Baris profil berisi avatar atau ikon fallback, nama pengguna dari data sesi bila tersedia, sapaan singkat, chip role `Admin`, dan tombol notifikasi.
+   - Jangan hardcode nama pengguna tertentu. Jika nama tidak tersedia, gunakan sapaan umum seperti `Selamat datang`.
+
+2. **Today's Schedule**
+   - Kartu utama lebar berisi label jadwal hari ini, jumlah aktivitas/jadwal kelas, dan ikon kalender.
+   - Jumlah harus berasal dari data backend yang tersedia. Jangan mengasumsikan nilai contoh pada screenshot adalah data nyata.
+   - Jika belum ada jadwal, tampilkan nilai nol atau empty state yang sesuai.
+
+3. **Kartu ringkasan**
+   - Dua kartu berdampingan: `Active Now` dan `Device ON`.
+   - Hitung dari data/API yang benar-benar tersedia dan pahami arti status berdasarkan model backend sebelum menghitung.
+   - Gunakan layout responsif; pada layar sangat sempit, kartu boleh menyesuaikan ukuran atau ditumpuk agar tidak overflow.
+
+4. **Quick Access**
+   - Empat shortcut dengan ikon, label dua baris bila perlu, dan target sentuh yang cukup besar:
+     - `Manage Schedule`
+     - `Manage Room`
+     - `Manage Device`
+     - `Manage User`
+   - Hubungkan shortcut ke halaman yang memang sudah tersedia. Periksa struktur project terlebih dahulu.
+   - Jangan membuat rute, screen, atau endpoint fiktif. Jika halaman tujuan belum dibuat, jangan mengklaim navigasi sudah berfungsi; gunakan TODO yang jelas atau beri tahu pengguna bahwa halaman tersebut perlu dibuat.
+   - Aksi `Manage User` hanya untuk Admin.
+
+5. **Live Classroom Status**
+   - Tampilkan judul bagian dan aksi `See All` hanya jika halaman daftar terkait tersedia.
+   - Gunakan kartu ruangan dengan nama ruangan, mode operasi (`AUTO`/`MANUAL` sesuai enum/model backend), status aktif/nonaktif, jumlah perangkat aktif/total jika datanya bisa diperoleh, serta jadwal berjalan jika tersedia.
+   - Ikon panah pada kartu harus membuka detail ruangan hanya jika halaman detail tersedia.
+   - Jangan menampilkan `Human Detection`, persentase deteksi manusia, atau fitur deteksi manusia karena fitur tersebut tidak termasuk scope aplikasi.
+   - Jangan menganggap suatu ruangan aktif hanya berdasarkan jumlah perangkat; gunakan definisi status yang sesuai dengan backend.
+
+6. **Recent Activity**
+   - Tampilkan beberapa aktivitas terbaru yang benar-benar berasal dari API/log aktivitas jika endpoint tersedia.
+   - Item dapat memuat ikon, waktu, nama ruangan, deskripsi aktivitas, dan label mode/sumber jika field tersebut tersedia.
+   - Format tanggal/waktu dari data backend dengan aman. Jangan membuat aktivitas fiktif agar UI terlihat penuh.
+   - Jika belum ada data atau endpoint belum tersedia, tampilkan empty state yang ringkas.
+
+7. **Attention Needed**
+   - Tampilkan ruangan/perangkat yang membutuhkan perhatian hanya jika status bermasalah dapat dikenali dari model atau API backend (misalnya offline/error).
+   - Jangan menyimpulkan perangkat offline dari data yang tidak tersedia. Jika tidak ada masalah, tampilkan pesan netral seperti `Tidak ada masalah yang perlu ditangani`.
+   - `See All` hanya aktif jika tujuan navigasinya tersedia.
+
+## Integrasi data dan arsitektur
+- Sebelum mengubah kode, periksa struktur project, service, model, konfigurasi API, navigasi, dan endpoint backend yang benar-benar ada.
+- Gunakan service/repository/API client yang sudah ada; jangan membuat HTTP request langsung di widget jika project sudah memiliki lapisan service.
+- Gunakan endpoint yang terverifikasi, kemungkinan terkait rooms, devices, schedules, users, device commands, atau activity logs. Periksa implementasi backend untuk memastikan path, format respons, enum, dan hak akses; jangan mengarang endpoint atau field.
+- Bedakan loading, empty, error, dan success state. Tampilkan pesan error yang ramah dan opsi coba lagi bila sesuai.
+- Hindari request API berulang setiap kali widget rebuild. Gunakan pola state management yang sudah dipakai project.
+- Jangan hardcode statistik, daftar ruangan, aktivitas, status perangkat, nama, atau waktu sebagai data produksi. Data placeholder hanya boleh dipakai jika pengguna secara eksplisit meminta mockup.
+- Jangan mencetak access token, refresh token, password, atau informasi sensitif ke log.
+
+## Role dan keamanan
+- Dashboard ini khusus role `ADMIN`.
+- Pertahankan mekanisme autentikasi dan penyimpanan token yang sudah ada. Jangan mengubah backend atau logika JWT tanpa diminta.
+- Jangan menganggap menyembunyikan tombol di UI sudah cukup untuk keamanan; akses endpoint tetap ditentukan backend.
+- Jangan mengubah alur Login Page yang sudah bekerja. Pastikan routing berdasarkan role menggunakan data autentikasi yang sudah tersedia dan nilai role yang benar-benar dikembalikan backend.
+- Jangan menambahkan fitur Google Sign-In, reset password, atau fitur baru di luar permintaan pengguna.
+
+## Flutter implementation
+- Pisahkan dashboard Admin dari dashboard Petugas.
+- Gunakan widget reusable untuk kartu statistik, shortcut, kartu ruangan, item aktivitas, dan item perhatian bila bermanfaat.
+- Pastikan halaman menggunakan `SafeArea` dan scroll vertikal yang benar serta tidak overflow pada emulator ukuran kecil.
+- Perhatikan ukuran sentuh, kontras warna, label aksesibilitas, dan indikator loading.
+- Gunakan ikon dari dependency yang sudah tersedia; jangan menambah dependency baru tanpa alasan yang jelas.
+- Pertahankan kode yang ada dan lakukan perubahan sekecil mungkin. Jangan menghapus atau menulis ulang file lain yang tidak terkait.
+- Setelah implementasi, jalankan `dart format` pada file yang diubah dan `flutter analyze`; perbaiki error yang muncul dan laporkan file yang berubah serta data/API yang berhasil dihubungkan.
+
+## Batasan scope
+- Fokus pada Beranda/Dashboard Admin sesuai referensi `Beranda.png`.
+- Jangan membuat Dashboard Petugas dengan aturan ini.
+- Jangan mengimplementasikan Human Detection.
+- Jangan mengubah skema database, backend, endpoint, autentikasi, atau aturan role kecuali diminta secara eksplisit.

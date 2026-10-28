@@ -136,6 +136,32 @@ class AuthService {
     return null;
   }
 
+  // Claim UI saja. Bukan verifikasi tanda tangan JWT.
+  String? fullNameFromAccessToken(String accessToken) {
+    final parts = accessToken.split('.');
+    if (parts.length < 2) {
+      return null;
+    }
+
+    try {
+      final normalized = base64Url.normalize(parts[1]);
+      final payload = utf8.decode(
+        base64Url.decode(normalized),
+      );
+      final data = jsonDecode(payload);
+      if (data is! Map) {
+        return null;
+      }
+      final name = data['fullName'];
+      if (name is! String || name.trim().isEmpty) {
+        return null;
+      }
+      return name.trim();
+    } on FormatException {
+      return null;
+    }
+  }
+
   // =========================================================
   // PSEUDOCODE REFRESH TOKEN
   // =========================================================
