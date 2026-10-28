@@ -195,11 +195,13 @@ class AuthService {
       '${ApiConfig.baseUrl}/auth/refresh',
     );
 
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'refreshToken': refreshToken}),
-    );
+    final response = await http
+        .post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'refreshToken': refreshToken}),
+        )
+        .timeout(const Duration(seconds: 20));
 
     final responseData = jsonDecode(response.body);
 

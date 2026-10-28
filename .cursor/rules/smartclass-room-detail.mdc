@@ -1,0 +1,105 @@
+---
+description: UI rules khusus Room Detail SmartClass dalam Auto Mode dan Manual Mode
+globs:
+  - "lib/screens/room_detail/**/*.dart"
+  - "lib/screens/room_detail*.dart"
+alwaysApply: false
+---
+
+# SmartClass — Room Detail UI Rules
+
+## Tujuan
+Bangun atau modifikasi halaman **Room Detail** berdasarkan dua screenshot referensi yang diberikan:
+- Room Detail — Auto Mode
+- Room Detail — Manual Mode
+
+Room Detail dibuka ketika pengguna memilih kartu ruangan pada **Room Page**. Halaman ini bukan item Navbar tersendiri; menu **Room** pada bottom navigation tetap menjadi menu aktif.
+
+Ikuti juga `.cursor/rules/smartclass-ui-general.mdc` dan gunakan Atomic Design sesuai kebutuhan.
+
+## Visual direction
+- Mobile-first, dark mode.
+- Background hitam dengan aksen gradient biru gelap/cyan di bagian atas.
+- Teks utama putih, teks sekunder abu-abu muda.
+- Card berwarna abu-abu gelap dengan sudut membulat.
+- Tombol utama menggunakan biru SmartClass.
+- Pertahankan ukuran, jarak, alignment, radius, dan hierarki visual sedekat mungkin dengan screenshot.
+- Hormati safe area Android dan pastikan konten dapat discroll jika tinggi layar tidak mencukupi.
+- Jangan menambahkan bottom navigation kedua. Gunakan komponen Navbar bersama yang sudah ada jika tersedia.
+
+## Susunan halaman bersama untuk Auto dan Manual Mode
+1. Header dengan tombol kembali berbentuk lingkaran dan judul `Room Detail`.
+2. Nama ruangan, badge mode (`AUTO MODE` atau `Manual`), dan status ruangan (`Active`/`Inactive`) dengan indikator warna.
+3. Foto ruangan dalam card/banner besar dengan sudut membulat dan overlay biru bila sesuai aset/desain.
+4. Kartu ringkasan berisi:
+   - jumlah perangkat menyala dibanding total perangkat;
+   - jadwal saat ini;
+   - slot metrik ketiga hanya jika fitur dan data tersebut memang tersedia.
+5. Konten di bawahnya berubah sesuai mode operasi.
+
+Gunakan data ruangan yang dipilih dari Room Page. Jangan menuliskan nama ruangan, jumlah perangkat, jadwal, atau status contoh secara permanen di UI.
+
+## Auto Mode
+- Tampilkan heading `Device Status`.
+- Tampilkan tiga kartu ringkas untuk kategori perangkat yang memang tersedia di ruangan:
+  - Lamp;
+  - Air Conditioner;
+  - Projector.
+- Tiap kartu menampilkan ikon kategori dan jumlah perangkat aktif/total, misalnya format `5/5 ON`, berdasarkan data backend.
+- Tampilkan tombol utama `Switch to Manual Mode`.
+- Tombol mode hanya mengubah mode jika operasi tersebut didukung service/API backend. Setelah berhasil, perbarui UI berdasarkan respons atau refresh data dari backend.
+- Selama request berlangsung, cegah aksi ganda dan tampilkan loading state. Jika gagal, tampilkan pesan error yang jelas dan pertahankan state sebelumnya.
+
+## Manual Mode
+- Tampilkan heading `Manual Control`.
+- Buat section/card terpisah untuk:
+  - `Lamp`;
+  - `Air Conditioner`;
+  - `Projector`.
+- Untuk Lamp, tampilkan setiap lamp zone sebagai kontrol yang dapat discroll horizontal bila melebihi lebar layar.
+- Untuk Air Conditioner, tampilkan tiap unit sebagai kontrol terpisah.
+- Untuk Projector, tampilkan kontrol perangkat sesuai jumlah perangkat yang dikonfigurasi.
+- Bedakan status ON dan OFF dengan jelas menggunakan warna, ikon, label, dan state visual yang konsisten dengan screenshot.
+- Setiap kontrol harus menunjukkan status aktual perangkat dan mengirim perintah hanya melalui service/API yang sudah tersedia.
+- Tampilkan loading/error per kontrol bila memungkinkan; jangan mengubah status visual seolah-olah berhasil sebelum backend mengonfirmasi.
+- Tampilkan tombol `Switch to Auto Mode` jika sesuai dengan desain dan didukung backend.
+- Jika perubahan mode tidak didukung backend, jangan membuat tombol yang berpura-pura berfungsi; laporkan keterbatasannya.
+
+## Human Detection dan metrik yang belum didukung
+- Jangan membuat algoritma, integrasi, endpoint, atau data palsu untuk Human Detection.
+- Jangan menampilkan persentase deteksi rekaan seperti `91%`.
+- Jika fitur Human Detection belum tersedia dan tetap di luar scope, sembunyikan metrik tersebut atau tampilkan status tidak tersedia dengan cara yang konsisten dengan desain. Jangan menganggapnya sebagai fitur yang sudah berjalan.
+- Semua metrik lain juga harus berasal dari data yang tersedia. Jika data kosong, gunakan empty state atau tanda yang sesuai, bukan angka contoh yang terlihat seperti data nyata.
+
+## Atomic Design dan tanggung jawab komponen
+Gunakan kembali komponen yang sudah ada bila sesuai. Jangan membuat struktur duplikat hanya untuk memenuhi nama lapisan.
+
+- **Atoms:** badge mode, indikator status, ikon kategori perangkat, label status, dan tombol dasar jika reusable.
+- **Molecules:** ringkasan satu metrik, kartu status satu kategori perangkat, dan kontrol satu perangkat.
+- **Organisms:** header Room Detail, kartu ringkasan, section Device Status, dan section Manual Control.
+- **Templates:** layout Room Detail yang menata header, foto, ringkasan, dan konten berdasarkan mode.
+- **Page:** Room Detail page yang mengambil data ruangan terpilih, mengelola state pemuatan/error, memanggil service, dan menghubungkan callback ke komponen.
+
+Pisahkan UI dari request HTTP dan aturan bisnis. Komponen visual harus menerima data dan callback melalui parameter. Jangan menaruh pemanggilan API di atoms, molecules, organisms, atau templates.
+
+## Navigasi dan integrasi
+- Periksa struktur project, Room Page, Room Card, model, service, dan endpoint backend sebelum coding.
+- Pastikan Room Page mengirim identitas ruangan yang dipilih ke Room Detail, bukan selalu menampilkan ruangan statis.
+- Gunakan endpoint dan service yang benar-benar ada. Jangan mengarang endpoint, mengubah kontrak API, atau memakai data dummy seolah-olah data nyata.
+- Pertahankan autentikasi JWT, penyimpanan token, dan role authorization yang sudah ada.
+- Jangan mengubah Login Page, Manage Room, atau halaman lain di luar scope kecuali perubahan integrasi kecil memang diperlukan; jelaskan perubahan tersebut.
+- Jangan membuat Navbar baru. Jika Navbar global sudah tersedia, gunakan kembali dan pastikan Room tetap aktif ketika Room Detail dibuka.
+
+## Accessibility dan responsivitas
+- Tombol kontrol harus memiliki label yang jelas dan area sentuh yang memadai.
+- Jangan hanya membedakan ON/OFF dengan warna; sertakan label atau ikon.
+- Pastikan horizontal scroll untuk Lamp Zone tidak membuat seluruh halaman overflow.
+- Pastikan tombol kembali, perubahan mode, dan kontrol perangkat tetap dapat digunakan pada berbagai ukuran layar Android.
+
+## Validasi setelah implementasi
+1. Jalankan `dart format` pada file yang berubah.
+2. Jalankan `flutter analyze` dan perbaiki error yang disebabkan perubahan.
+3. Uji tampilan Auto Mode dan Manual Mode.
+4. Uji pemilihan ruangan dari Room Page, tombol kembali, state ON/OFF, loading/error, serta perpindahan mode jika backend mendukung.
+5. Laporkan file yang dibuat/diubah, service dan endpoint yang digunakan, fungsi yang sudah berjalan, dan hal yang belum didukung backend.
+6. Jangan menyatakan pengujian berhasil jika belum benar-benar dijalankan.

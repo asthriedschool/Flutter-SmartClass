@@ -11,4 +11,17 @@ class DeviceService {
     final rows = await _apiClient.getList('/devices');
     return rows.map(Device.fromJson).toList();
   }
+
+  Future<Device> updateStatus({
+    required int idDevice,
+    required String status,
+  }) async {
+    final json = await _apiClient.sendObject(
+      'PATCH',
+      '/devices/$idDevice/status',
+      query: {'status': status},
+      fallback: 'Status perangkat gagal diubah.',
+    );
+    return Device.fromJson(json);
+  }
 }
