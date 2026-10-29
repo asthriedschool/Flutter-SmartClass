@@ -1,0 +1,85 @@
+---
+description: Aturan UI khusus Schedule Page SmartClass berdasarkan screenshot referensi
+globs:
+  - "lib/screens/schedule/**/*.dart"
+  - "lib/screens/schedule*.dart"
+alwaysApply: false
+---
+
+# SmartClass — Schedule Page UI Rules
+
+## Tujuan
+Bangun atau modifikasi **Schedule Page** Flutter berdasarkan screenshot referensi. Halaman ini digunakan untuk melihat dan mengelola jadwal kelas. Menu Schedule pada bottom navigation membuka halaman ini; halaman ini berbeda dari form Add Schedule atau Edit Schedule.
+
+Ikuti `.cursor/rules/smartclass-ui-general.mdc` dan terapkan Atomic Design sesuai kebutuhan.
+
+## Visual direction
+- Desain mobile-first dengan dark mode.
+- Background dominan hitam, aksen gradient biru gelap/cyan di bagian atas.
+- Teks utama putih dan teks sekunder abu-abu muda.
+- Tombol utama menggunakan biru SmartClass.
+- Kartu ringkasan berwarna abu-abu gelap dengan border tipis dan sudut membulat.
+- Kartu jadwal menggunakan foto kelas sebagai background jika aset yang sesuai tersedia, dengan overlay biru transparan agar teks tetap terbaca.
+- Pertahankan proporsi, spacing, radius, alignment, tipografi, dan hierarki visual sesuai screenshot.
+- Perhitungkan safe area Android dan scrolling; jangan sampai konten atau bottom navigation overflow.
+- Gunakan komponen bottom navigation bersama yang sudah ada. Jangan membuat Navbar duplikat. Menu Schedule harus tampil sebagai menu aktif pada halaman ini.
+
+## Susunan halaman
+1. Header dengan judul `Schedule`, subtitle `Manage Classroom Schedules`, dan tombol `Add Schedule`.
+2. Search field untuk mencari berdasarkan subject.
+3. Filter interaktif: `All`, `Today`, `Active`, `Upcoming`, dan `Inactive`.
+4. Kartu ringkasan statistik: Today's Schedule, Active Now, Upcoming, dan Finished.
+5. Daftar kartu jadwal yang menampilkan, jika datanya tersedia: nama ruangan, mode operasi, status jadwal, subject, jam mulai-selesai, tanggal, nama pengajar/pemilik jadwal, serta tombol Edit dan Delete.
+6. Bottom navigation bersama di bagian bawah dengan menu Schedule aktif.
+
+## Perilaku data dan filter
+- Periksa model, service, dan endpoint backend yang tersedia sebelum implementasi.
+- Gunakan data jadwal asli dari backend. Jangan hardcode angka statistik atau isi kartu dari screenshot.
+- Search memfilter subject tanpa mereset filter status yang sedang dipilih.
+- `All` menampilkan semua jadwal yang boleh dilihat pengguna.
+- `Today` menampilkan jadwal pada tanggal lokal hari ini berdasarkan data tanggal.
+- `Active` menampilkan jadwal yang sedang berlangsung jika tanggal dan waktu tersedia.
+- `Upcoming` menampilkan jadwal yang belum dimulai.
+- `Inactive` menampilkan jadwal yang tidak aktif sesuai definisi backend. Jangan menyamakan `Inactive` dengan `Finished` tanpa memeriksa model dan aturan backend.
+- Jika backend menyediakan status eksplisit, gunakan nilai backend. Jika status perlu diturunkan dari tanggal/jam, lakukan hanya jika field yang diperlukan tersedia.
+- Statistik harus dihitung dari data aktual dan konsisten dengan definisi status.
+- Sediakan loading state, error state, dan empty state.
+- Format tanggal dan jam secara konsisten untuk pengguna Indonesia.
+
+## Aksi jadwal
+- `Add Schedule` membuka halaman tambah jadwal yang sudah ada. Jika belum tersedia, jangan membuat navigasi palsu.
+- `Edit` membuka form edit dengan data jadwal terpilih.
+- `Delete` meminta konfirmasi sebelum menghapus. Setelah berhasil, refresh daftar dan statistik.
+- Tampilkan feedback sukses/gagal berdasarkan hasil operasi sebenarnya.
+- Cegah request ganda saat aksi berlangsung.
+- Jangan menyatakan aksi berhasil atau mengubah status permanen sebelum backend mengonfirmasi.
+- Jangan mengarang endpoint, field model, atau aturan status.
+
+## Atomic Design dan struktur kode
+Gunakan kembali komponen yang sudah ada bila sesuai. Hindari memecah setiap widget kecil menjadi file terpisah hanya demi memenuhi Atomic Design.
+
+- **Atoms:** ikon status, badge mode/status, tombol kecil, dan elemen visual dasar yang reusable.
+- **Molecules:** search field, filter chip, satu item statistik, dan baris metadata jadwal.
+- **Organisms:** header Schedule, kartu statistik, kartu jadwal, dan kelompok filter.
+- **Templates:** layout Schedule yang mengatur header, search, filter, statistik, daftar, dan ruang untuk bottom navigation.
+- **Page:** Schedule Page yang mengelola state pencarian/filter, memanggil service, menangani loading/error/empty state, dan menghubungkan aksi ke komponen.
+
+Pisahkan presentasi dari request HTTP dan aturan bisnis. Komponen visual menerima data dan callback melalui parameter. Jangan menaruh pemanggilan API di atoms, molecules, organisms, atau templates.
+
+Gunakan struktur folder project yang sudah ada bila tersedia. Jangan membuat folder atau komponen kedua dengan tanggung jawab yang sama.
+
+## Integrasi dan batasan
+- Periksa halaman Room, Manage Room, Room Detail, dan Navbar agar pola visual serta navigasi konsisten.
+- Gunakan aset lokal yang tersedia; periksa nama dan path aktual sebelum dipakai.
+- Pertahankan autentikasi JWT, penyimpanan token, dan pembatasan role.
+- Jangan mengubah backend, Login Page, Room Page, Manage Room, atau Room Detail kecuali diperlukan untuk integrasi kecil; jelaskan perubahan tersebut.
+- Jangan menambahkan fitur Human Detection atau metrik yang tidak relevan dengan Schedule Page.
+- Jangan menambahkan dependency baru jika package yang sudah tersedia cukup.
+
+## Validasi setelah implementasi
+1. Jalankan `dart format` pada file yang berubah.
+2. Jalankan `flutter analyze` dan perbaiki error yang disebabkan perubahan.
+3. Uji pencarian, setiap filter, statistik, Add/Edit/Delete jika halaman dan endpoint tersedia, serta menu Schedule pada Navbar.
+4. Periksa beberapa ukuran layar Android dan pastikan tidak ada overflow.
+5. Laporkan file yang dibuat/diubah, endpoint yang benar-benar digunakan, fitur yang berhasil, dan hal yang belum didukung backend.
+6. Jangan mengklaim pengujian berhasil jika belum benar-benar dijalankan.

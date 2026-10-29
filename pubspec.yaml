@@ -68,6 +68,7 @@ flutter:
     - assets/asset_navbar/schedule/
     - assets/asset_navbar/profile/
     - assets/asset_manage_room/
+    - assets/asset_schedule_page/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

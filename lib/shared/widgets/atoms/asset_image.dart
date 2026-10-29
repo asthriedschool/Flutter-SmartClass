@@ -9,6 +9,7 @@ import '../../login_colors.dart';
 const loginAssetDir = 'assets/asset_login_page';
 const berandaAssetDir = 'assets/asset_beranda_page';
 const manageRoomAssetDir = 'assets/asset_manage_room';
+const scheduleAssetDir = 'assets/asset_schedule_page';
 
 class LocalAssetImage extends StatelessWidget {
   const LocalAssetImage({
