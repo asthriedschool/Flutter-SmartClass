@@ -17,6 +17,7 @@ import '../../storage/token_storage.dart';
 import '../login/login_screen.dart';
 import 'admin_home_data.dart';
 import 'manage_room_screen.dart';
+import 'manage_device_screen.dart';
 import 'manage_users_screen.dart';
 import '../schedule/schedule_page.dart';
 import 'room_page.dart';
@@ -151,6 +152,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
   }
 
+  Future<void> _openManageDevice() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const ManageDeviceScreen(),
+      ),
+    );
+    if (mounted) {
+      await _load();
+    }
+  }
+
   Future<void> _openManageUsers() async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -174,6 +186,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   void _onQuickAccess(String pageName) {
+    if (pageName == 'kelola perangkat') {
+      _openManageDevice();
+      return;
+    }
     if (pageName == 'kelola ruangan') {
       _openManageRoom();
       return;
