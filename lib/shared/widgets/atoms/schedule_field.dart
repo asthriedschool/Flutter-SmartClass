@@ -30,22 +30,33 @@ class ScheduleTextField extends StatelessWidget {
     required this.controller,
     required this.hint,
     required this.enabled,
+    this.obscureText = false,
+    this.keyboardType,
+    this.suffix,
   });
 
   final TextEditingController controller;
   final String hint;
   final bool enabled;
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final Widget? suffix;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
       enabled: enabled,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
       style: const TextStyle(
         color: AppColors.text,
         fontSize: 14,
       ),
-      decoration: _fieldDecoration(hint: hint),
+      decoration: _fieldDecoration(
+        hint: hint,
+        suffix: suffix,
+      ),
     );
   }
 }
@@ -156,9 +167,13 @@ class SchedulePickerField extends StatelessWidget {
   }
 }
 
-InputDecoration _fieldDecoration({String? hint}) {
+InputDecoration _fieldDecoration({
+  String? hint,
+  Widget? suffix,
+}) {
   return InputDecoration(
     hintText: hint,
+    suffixIcon: suffix,
     hintStyle: const TextStyle(
       color: AppColors.muted,
       fontSize: 13,

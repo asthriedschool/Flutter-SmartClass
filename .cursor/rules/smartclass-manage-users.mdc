@@ -1,0 +1,332 @@
+---
+description: UI rules khusus Manage Users untuk SmartClass Admin
+globs:
+  - "lib/screens/**/manage_user*.dart"
+  - "lib/screens/**/user_management*.dart"
+  - "lib/screens/**/users/**/*.dart"
+alwaysApply: false
+---
+
+# SmartClass — Manage Users UI Rules
+
+## Tujuan
+
+Rancang dan implementasikan halaman **Manage Users** untuk Admin SmartClass.
+
+Belum ada desain khusus, jadi buat UI baru yang konsisten dengan halaman SmartClass yang sudah ada:
+- Beranda Admin
+- Room Page
+- Manage Room
+- Room Detail
+- Schedule
+- Add Schedule
+- Edit Schedule
+
+Halaman ini digunakan Admin untuk mengelola akun pengguna, bukan halaman profil pribadi atau halaman registrasi publik.
+
+Ikuti `.cursor/rules/smartclass-ui-general.mdc` dan aturan Atomic Design yang tersedia.
+
+Periksa struktur project dan halaman yang sudah ada sebelum coding.
+
+## 1. Navigasi halaman
+
+**Manage Users dibuka melalui Quick Access pada Beranda Admin, bukan melalui Navbar.**
+
+Alur navigasi yang diharapkan:
+
+Beranda Admin → Quick Access → Manage User → Manage Users
+
+Ketentuan:
+- Hubungkan tombol `Manage User` pada Quick Access Beranda Admin ke halaman Manage Users.
+- Tombol kembali pada Manage Users harus mengembalikan Admin ke Beranda Admin.
+- Jangan menambahkan Manage Users sebagai item pada bottom navigation.
+- Jangan membuat Navbar khusus untuk Manage Users.
+- Jangan mengubah item Navbar yang sudah ada.
+- Ikuti pola navigasi halaman sekunder yang sudah digunakan dalam project.
+- Pastikan halaman hanya dapat diakses oleh role `ADMIN`.
+- Pertahankan mekanisme autentikasi dan otorisasi yang sudah tersedia.
+
+## 2. Arah desain UI
+
+Karena belum ada desain referensi khusus, rancang UI yang konsisten dengan design system SmartClass.
+
+Gunakan karakteristik berikut:
+- Desain mobile-first.
+- Dark mode.
+- Background hitam dengan aksen gradient biru gelap/cyan di bagian atas.
+- Teks utama berwarna putih.
+- Teks sekunder berwarna abu-abu muda.
+- Card dan panel berwarna abu-abu gelap dengan sudut membulat.
+- Aksen biru SmartClass untuk tombol utama dan elemen interaktif.
+- Tipografi, spacing, radius, ikon, dan hierarki visual konsisten dengan halaman Room dan Schedule.
+- Gunakan layout daftar atau kartu pengguna yang nyaman dibaca di layar ponsel.
+- Jangan memaksakan tabel desktop ke layar mobile.
+- Pastikan tampilan responsif dan tidak mengalami overflow.
+
+Gunakan kembali komponen dan aset lokal yang sudah tersedia jika sesuai.
+
+Jangan mengarang path aset baru sebelum memeriksa folder `assets/`.
+
+## 3. Susunan halaman Manage Users
+
+### A. Header
+
+Tampilkan:
+- Judul `Manage Users`.
+- Subtitle singkat, misalnya `Manage SmartClass accounts`.
+- Tombol kembali.
+- Tombol `Add User` jika fitur tambah pengguna didukung backend.
+
+Gunakan gaya header yang konsisten dengan halaman Manage Room dan Schedule.
+
+### B. Search Field
+
+Sediakan kolom pencarian berdasarkan nama atau email, sesuai field yang tersedia pada model pengguna.
+
+Ketentuan:
+- Pencarian harus berfungsi.
+- Daftar pengguna diperbarui sesuai kata kunci.
+- Pencarian tidak boleh menghilangkan filter role yang sedang dipilih.
+- Tampilkan empty state jika tidak ada pengguna yang cocok.
+
+### C. Filter Role
+
+Sediakan filter jika data role tersedia:
+- `All`
+- `ADMIN`
+- `PETUGAS`
+
+Ketentuan:
+- Filter harus berfungsi.
+- Gunakan nilai role yang sama persis dengan backend.
+- Jangan membuat role baru.
+- Filter harus dapat digunakan bersama pencarian.
+
+### D. Ringkasan Pengguna
+
+Jika sesuai dengan desain, tampilkan ringkasan jumlah pengguna, misalnya:
+- Total Users
+- Admin
+- Petugas
+
+Angka harus dihitung dari data backend yang tersedia.
+
+Jangan menggunakan angka hardcoded atau data dummy yang terlihat seperti data asli.
+
+Jika data tidak tersedia, jangan memaksakan bagian statistik.
+
+### E. Daftar Pengguna
+
+Tampilkan daftar pengguna dalam bentuk card atau row.
+
+Informasi yang dapat ditampilkan, jika tersedia:
+- Nama pengguna.
+- Email.
+- Role.
+- Status akun, hanya jika backend memang menyediakan field status.
+- Tombol Edit.
+- Tombol Delete.
+
+Gunakan avatar atau inisial sederhana jika tidak ada foto profil.
+
+Jangan menambahkan aset avatar eksternal yang tidak diperlukan.
+
+Setiap kartu harus memiliki hierarki informasi yang jelas dan tetap nyaman digunakan pada layar Android berukuran kecil.
+
+## 4. Tambah dan Edit Pengguna
+
+Sebelum membuat halaman baru, periksa apakah form Add User dan Edit User sudah tersedia.
+
+Jika belum tersedia, rancang form sederhana yang konsisten dengan halaman Add Schedule dan Edit Schedule.
+
+Gunakan:
+- Header dengan judul dan tombol kembali.
+- Field yang dikelompokkan dengan jelas.
+- Label dan validasi input.
+- Tombol Cancel.
+- Tombol Create User atau Save Changes sesuai konteks.
+
+Gunakan hanya field yang benar-benar didukung oleh model dan endpoint backend.
+
+Field seperti nama, email, dan role hanya boleh digunakan jika memang tersedia dalam sistem.
+
+### Aturan Role
+
+Role yang dikenal dalam project:
+- `ADMIN`
+- `PETUGAS`
+
+Ketentuan:
+- Gunakan nilai role yang persis sama dengan backend.
+- Periksa kebijakan backend sebelum mengizinkan pembuatan atau perubahan role.
+- Jangan membuat alur yang memungkinkan pengguna biasa menaikkan role sendiri.
+- Jika backend tidak mendukung pembuatan akun Admin melalui UI, jangan mengasumsikan fitur tersebut tersedia.
+- Jelaskan keterbatasan backend jika suatu operasi tidak didukung.
+
+### Aturan Password
+
+- Jangan menampilkan password atau hash password pada daftar pengguna.
+- Jangan menampilkan access token atau refresh token.
+- Jangan mengembalikan password hash dari response API ke UI.
+- Jangan membuat fitur reset password kecuali endpoint dan alurnya memang tersedia.
+- Ikuti mekanisme keamanan yang sudah diterapkan pada backend.
+
+## 5. Aksi Edit dan Delete
+
+### Edit User
+
+- Tombol Edit membuka form dengan data pengguna yang dipilih.
+- Form harus menggunakan data pengguna yang benar.
+- Simpan perubahan melalui service dan endpoint yang tersedia.
+- Perbarui daftar setelah backend mengonfirmasi keberhasilan.
+- Tampilkan pesan error jika operasi gagal.
+
+### Delete User
+
+- Tombol Delete harus menampilkan dialog konfirmasi.
+- Dialog harus menyebutkan pengguna yang akan dihapus.
+- Jangan menghapus data sebelum pengguna mengonfirmasi.
+- Setelah backend berhasil menghapus data, perbarui daftar.
+- Jika penghapusan gagal, tampilkan pesan yang jelas.
+- Cegah request ganda saat operasi berlangsung.
+
+Jika backend melarang penghapusan akun sendiri atau Admin terakhir, pertahankan aturan tersebut dan tampilkan pesan yang sesuai.
+
+Jangan mengubah tampilan seolah-olah operasi berhasil sebelum backend mengonfirmasi.
+
+## 6. Loading, Error, dan Empty State
+
+Implementasikan kondisi UI berikut:
+
+### Loading State
+Tampilkan indikator loading saat mengambil atau memperbarui data pengguna.
+
+### Error State
+Tampilkan pesan error yang jelas jika request gagal.
+
+Sediakan tombol untuk mencoba kembali jika sesuai.
+
+Tangani error autentikasi dan otorisasi, termasuk HTTP 401 dan 403.
+
+### Empty State
+Tampilkan pesan yang sesuai ketika:
+- Belum ada pengguna.
+- Hasil pencarian kosong.
+- Filter role tidak menemukan pengguna.
+
+Jangan menampilkan data dummy sebagai pengganti data yang gagal dimuat.
+
+## 7. Atomic Design
+
+Terapkan Atomic Design secara pragmatis.
+
+Gunakan kembali komponen yang sudah ada. Jangan memecah setiap widget kecil menjadi file terpisah hanya demi memenuhi Atomic Design.
+
+### Atoms
+
+Contoh:
+- Role badge.
+- Avatar atau inisial.
+- Ikon aksi.
+- Tombol dasar.
+- Label.
+
+### Molecules
+
+Contoh:
+- Search field.
+- Filter chip.
+- Metadata pengguna.
+- Tombol aksi pengguna.
+
+### Organisms
+
+Contoh:
+- Header Manage Users.
+- Kelompok pencarian dan filter.
+- Kartu pengguna.
+- Dialog konfirmasi Delete.
+
+### Templates
+
+Mengatur susunan:
+- Header.
+- Search field.
+- Filter role.
+- Ringkasan pengguna jika tersedia.
+- Daftar pengguna.
+- Area tombol atau navigasi kembali.
+
+### Pages
+
+Halaman Manage Users bertanggung jawab untuk:
+- Mengelola state pencarian.
+- Mengelola filter role.
+- Memanggil service pengguna.
+- Menangani loading, error, dan empty state.
+- Menghubungkan aksi Add, Edit, dan Delete.
+- Mengatur navigasi kembali ke Beranda Admin.
+
+Pisahkan UI dari request HTTP dan aturan bisnis.
+
+Komponen visual harus menerima data dan callback melalui parameter.
+
+Jangan menaruh request API di atoms, molecules, organisms, atau templates.
+
+Ikuti konvensi folder dan nama file yang sudah ada.
+
+Jangan membuat service atau model duplikat jika project sudah memiliki UserService, model user, DTO, atau endpoint yang sesuai.
+
+## 8. Integrasi Backend
+
+Sebelum implementasi, periksa:
+- Struktur project Flutter.
+- Model pengguna.
+- UserService yang sudah ada.
+- DTO atau response pengguna.
+- Endpoint backend.
+- Aturan authorization.
+- Navigasi Quick Access pada Beranda Admin.
+
+Ketentuan:
+- Gunakan endpoint yang benar-benar tersedia.
+- Jangan mengarang endpoint, field, status akun, atau kemampuan CRUD.
+- Jangan mengubah backend hanya untuk menyesuaikan UI.
+- Jangan menggunakan data dummy seolah-olah data asli.
+- Pertahankan JWT dan secure token storage.
+- Pertahankan alur Login dan role yang sudah berjalan.
+- Jangan mengubah halaman lain di luar perubahan integrasi kecil yang memang diperlukan.
+- Jika diperlukan perubahan pada Beranda Admin untuk menghubungkan Quick Access, lakukan seminimal mungkin dan laporkan perubahan tersebut.
+
+## 9. Keamanan dan Hak Akses
+
+Manage Users merupakan halaman khusus Admin.
+
+Pastikan:
+- Halaman dibuka melalui Quick Access Beranda Admin.
+- Akses dibatasi untuk role `ADMIN`.
+- Backend tetap memverifikasi role pada setiap operasi.
+- Tombol atau menu yang disembunyikan di UI tidak dianggap sebagai pengganti keamanan backend.
+- Petugas tidak dapat menjalankan operasi administrasi pengguna.
+- Token dan password tidak pernah ditampilkan pada UI.
+
+Jangan mengubah kebijakan autentikasi yang sudah ada.
+
+## 10. Validasi Setelah Implementasi
+
+Setelah implementasi selesai:
+
+1. Jalankan `dart format` pada file yang berubah.
+2. Jalankan `flutter analyze`.
+3. Perbaiki error yang disebabkan perubahan.
+4. Uji pencarian pengguna.
+5. Uji filter role.
+6. Uji loading, error, dan empty state.
+7. Uji Add, Edit, dan Delete jika backend mendukungnya.
+8. Pastikan tombol Quick Access `Manage User` membuka Manage Users.
+9. Pastikan tombol kembali mengarah ke Beranda Admin.
+10. Pastikan Manage Users tidak ditambahkan ke Navbar.
+11. Pastikan akses hanya diberikan kepada Admin.
+12. Laporkan file yang dibuat atau diubah, endpoint yang benar-benar digunakan, fitur yang berhasil, dan keterbatasan backend.
+
+Jangan mengklaim pengujian berhasil jika belum benar-benar dijalankan.

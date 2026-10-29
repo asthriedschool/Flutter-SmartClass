@@ -17,6 +17,7 @@ import '../../storage/token_storage.dart';
 import '../login/login_screen.dart';
 import 'admin_home_data.dart';
 import 'manage_room_screen.dart';
+import 'manage_users_screen.dart';
 import '../schedule/schedule_page.dart';
 import 'room_page.dart';
 
@@ -150,6 +151,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
   }
 
+  Future<void> _openManageUsers() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const ManageUsersScreen(),
+      ),
+    );
+    if (mounted) {
+      await _load();
+    }
+  }
+
   Future<void> _openSchedulePage() async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -168,6 +180,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
     if (pageName == 'kelola jadwal') {
       _openSchedulePage();
+      return;
+    }
+    if (pageName == 'kelola pengguna') {
+      _openManageUsers();
       return;
     }
     _showUnavailable(pageName);
