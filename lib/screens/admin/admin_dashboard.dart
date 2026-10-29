@@ -17,6 +17,7 @@ import '../../storage/token_storage.dart';
 import '../login/login_screen.dart';
 import 'admin_home_data.dart';
 import 'manage_room_screen.dart';
+import '../schedule/schedule_page.dart';
 import 'room_page.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -149,9 +150,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
   }
 
+  Future<void> _openSchedulePage() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const SchedulePage(),
+      ),
+    );
+    if (mounted) {
+      await _load();
+    }
+  }
+
   void _onQuickAccess(String pageName) {
     if (pageName == 'kelola ruangan') {
       _openManageRoom();
+      return;
+    }
+    if (pageName == 'kelola jadwal') {
+      _openSchedulePage();
       return;
     }
     _showUnavailable(pageName);
@@ -162,10 +178,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
       _openRoomPage();
       return;
     }
-    const unavailable = <int, String>{
-      2: 'Schedule',
-      3: 'Profile',
-    };
+    if (index == 2) {
+      _openSchedulePage();
+      return;
+    }
+    const unavailable = <int, String>{3: 'Profile'};
     final pageName = unavailable[index];
     if (pageName == null) {
       return;

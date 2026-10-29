@@ -15,6 +15,7 @@ import '../../shared/widgets/organisms/smart_bottom_nav.dart';
 import '../login/login_screen.dart';
 import 'manage_room_screen.dart';
 import 'room_detail_page.dart';
+import '../schedule/schedule_page.dart';
 import 'room_schedule.dart';
 
 class RoomPage extends StatefulWidget {
@@ -179,7 +180,15 @@ class _RoomPageState extends State<RoomPage> {
     if (index == 1) {
       return;
     }
-    const names = {2: 'Schedule', 3: 'Profile'};
+    if (index == 2) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const SchedulePage(),
+        ),
+      );
+      return;
+    }
+    const names = {3: 'Profile'};
     final name = names[index];
     if (name == null || !mounted) {
       return;

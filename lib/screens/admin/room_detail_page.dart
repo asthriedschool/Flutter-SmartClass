@@ -13,6 +13,7 @@ import '../../shared/app_colors.dart';
 import '../../shared/widgets/organisms/room_detail_body.dart';
 import '../../shared/widgets/organisms/smart_bottom_nav.dart';
 import '../login/login_screen.dart';
+import '../schedule/schedule_page.dart';
 import 'room_schedule.dart';
 
 class RoomDetailPage extends StatefulWidget {
@@ -220,7 +221,15 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
       Navigator.of(context).pop();
       return;
     }
-    const names = {2: 'Schedule', 3: 'Profile'};
+    if (index == 2) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const SchedulePage(),
+        ),
+      );
+      return;
+    }
+    const names = {3: 'Profile'};
     final name = names[index];
     if (name != null) {
       _message('Halaman $name belum tersedia.');

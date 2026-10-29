@@ -1,3 +1,7 @@
+const otherRoomChoice = -1;
+const otherRoomBuilding = 'Lainnya';
+const otherRoomFloor = '-';
+
 class Room {
   const Room({
     required this.idRoom,
@@ -20,6 +24,18 @@ class Room {
   final String? picture;
 
   bool get isEnabled => systemStatus == 'ENABLED';
+
+  bool get isCustomEntry =>
+      building.trim() == otherRoomBuilding &&
+      floor.trim() == otherRoomFloor;
+
+  String get scheduleOption {
+    final place = building.trim();
+    if (place.isEmpty || isCustomEntry) {
+      return roomName;
+    }
+    return '$place - $roomName';
+  }
 
   String get locationLabel {
     final place = building.trim();
