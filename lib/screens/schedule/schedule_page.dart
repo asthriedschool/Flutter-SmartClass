@@ -11,6 +11,7 @@ import '../../shared/widgets/organisms/smart_bottom_nav.dart';
 import '../../shared/widgets/templates/schedule_template.dart';
 import '../../storage/token_storage.dart';
 import '../admin/room_page.dart';
+import '../profile/profile_page.dart';
 import '../login/login_screen.dart';
 import 'schedule_form_screen.dart';
 import 'schedule_status.dart';
@@ -242,7 +243,7 @@ class _SchedulePageState extends State<SchedulePage> {
       return;
     }
     if (index == 3) {
-      _message('Halaman Profile belum tersedia.');
+      ProfilePage.open(context);
     }
   }
 

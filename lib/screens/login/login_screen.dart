@@ -5,6 +5,7 @@ import '../../shared/widgets/organisms/login_form_card.dart';
 import '../../shared/widgets/templates/login_template.dart';
 import '../admin/admin_dashboard.dart';
 import '../petugas/petugas_dashboard.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -164,9 +165,13 @@ class _LoginScreenState extends State<LoginScreen> {
           'Reset password belum tersedia.',
         ),
         onSubmit: _submit,
-        onRegister: () => _showUnavailable(
-          'Halaman daftar belum tersedia.',
-        ),
+        onRegister: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const RegisterScreen(),
+            ),
+          );
+        },
       ),
     );
   }

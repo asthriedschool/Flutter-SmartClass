@@ -1,0 +1,80 @@
+---
+description: UI rules untuk Profile Page SmartClass IoT, mengikuti desain existing dan autentikasi pengguna
+globs:
+  - "lib/screens/**/profile*.dart"
+  - "lib/screens/**/account*.dart"
+  - "lib/widgets/**/profile*.dart"
+alwaysApply: false
+---
+
+# SmartClass Profile Page Rules
+
+## 1. Goal
+Implementasikan atau revisi Profile Page SmartClass IoT menggunakan desain yang konsisten dengan UI existing. Jangan membuat ulang project atau merusak halaman yang sudah berfungsi.
+
+## 2. Navigation
+- Profile Page diakses melalui item Profile pada bottom navigation yang sudah tersedia.
+- Pertahankan navbar, active state, dan navigasi existing.
+- Halaman dapat digunakan oleh ADMIN dan PETUGAS.
+- Jangan membuat navbar baru jika shared component sudah tersedia.
+
+## 3. Design
+- Ikuti dark theme, warna biru/cyan, gradient, card, typography, spacing, radius, dan icon yang digunakan halaman existing.
+- Gunakan desain mobile-first dan reusable components.
+- Terapkan Atomic Design sesuai struktur project yang sudah ada.
+- Jangan memperkenalkan desain visual yang berbeda dari Beranda, Room, Schedule, dan halaman lainnya.
+
+## 4. Profile Content
+Prioritaskan komponen berikut:
+
+1. Profile Header:
+   - Avatar atau inisial nama.
+   - Nama lengkap.
+   - Email.
+   - Badge role ADMIN atau PETUGAS.
+   - Tombol Edit Profile jika didukung backend.
+
+2. Account Information:
+   - Informasi nama dan email.
+   - Role pengguna ditampilkan sebagai informasi, bukan field yang dapat diubah sendiri.
+   - Gunakan data aktual dari akun yang sedang login.
+
+3. Security:
+   - Change Password hanya jika endpoint backend tersedia.
+   - Logout menggunakan mekanisme autentikasi existing.
+
+4. About SmartClass:
+   - Nama aplikasi dan versi jika tersedia.
+   - Informasi bantuan hanya jika sumber informasinya tersedia.
+
+Jangan menambahkan fitur notifikasi, pengaturan preferensi, atau menu lain yang belum didukung aplikasi.
+
+## 5. Backend and Authentication
+- Periksa AuthService, TokenStorage, model pengguna, API service, dan mekanisme JWT yang sudah tersedia.
+- Gunakan data pengguna yang sedang login, bukan mock data.
+- Pertahankan mekanisme refresh token dan logout existing.
+- Jangan menampilkan password, access token, refresh token, atau data sensitif.
+- Jangan mengarang endpoint atau mengubah backend/database.
+- Jika API edit profile atau change password belum tersedia, jangan membuat fitur palsu. Jelaskan keterbatasannya.
+
+## 6. UI States
+- Tampilkan loading state saat data sedang dimuat.
+- Tangani error dan data profil yang belum tersedia.
+- Gunakan avatar inisial sebagai fallback jika foto profil tidak tersedia.
+- Tampilkan feedback yang jelas untuk aksi berhasil atau gagal.
+- Gunakan dialog konfirmasi sebelum logout jika sesuai dengan pola UI existing.
+
+## 7. Constraints
+- Jangan mengubah Login, Dashboard, Room, Schedule, Manage Device, atau halaman lain yang tidak berkaitan.
+- Jangan menggandakan AuthService, model, navbar, atau komponen yang sudah tersedia.
+- Pisahkan UI dan logic mengikuti arsitektur existing.
+- Jangan menambahkan dependency baru tanpa kebutuhan yang jelas.
+- Pertahankan kompatibilitas dengan backend Spring Boot dan autentikasi JWT.
+
+## 8. Verification
+- Jalankan dart format pada file yang berubah.
+- Jalankan flutter analyze.
+- Periksa tampilan pada emulator.
+- Pastikan data sesuai pengguna yang login.
+- Pastikan logout dan navigasi bekerja sesuai implementasi existing.
+- Laporkan file yang dibuat/diubah dan fitur yang belum didukung backend.

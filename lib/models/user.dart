@@ -21,24 +21,7 @@ class AppUser {
 
   bool get isActive => accountStatus == 'ACTIVE';
 
-  String get initials {
-    final parts = fullName
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((part) => part.isNotEmpty)
-        .toList();
-    if (parts.isEmpty) {
-      return '?';
-    }
-    if (parts.length == 1) {
-      final word = parts.first;
-      return word.length == 1
-          ? word.toUpperCase()
-          : word.substring(0, 1).toUpperCase();
-    }
-    return '${parts.first[0]}${parts.last[0]}'
-        .toUpperCase();
-  }
+  String get initials => userInitials(fullName);
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
     final picture = json['profile_picture'];
@@ -56,6 +39,22 @@ class AppUser {
       lastLoginAt: _date(json['last_login_at']),
     );
   }
+}
+
+String userInitials(String fullName) {
+  final parts = fullName
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((part) => part.isNotEmpty)
+      .toList();
+  if (parts.isEmpty) {
+    return '?';
+  }
+  if (parts.length == 1) {
+    final word = parts.first;
+    return word[0].toUpperCase();
+  }
+  return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
 }
 
 DateTime? _date(Object? value) {

@@ -9,6 +9,7 @@ import '../../services/room_service.dart';
 import '../../shared/widgets/templates/manage_room_template.dart';
 import '../login/login_screen.dart';
 import 'room_form_screen.dart';
+import '../profile/profile_page.dart';
 import '../schedule/schedule_page.dart';
 import 'room_page.dart';
 
@@ -293,10 +294,8 @@ class _ManageRoomScreenState
       );
       return;
     }
-    const names = {3: 'Profile'};
-    final name = names[index];
-    if (name != null) {
-      _showMessage('Halaman $name belum tersedia.');
+    if (index == 3) {
+      ProfilePage.open(context);
     }
   }
 
