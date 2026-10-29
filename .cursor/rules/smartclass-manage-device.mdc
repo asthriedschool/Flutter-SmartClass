@@ -1,0 +1,261 @@
+---
+description: UI rules khusus Manage Device untuk SmartClass Admin, diakses melalui Quick Access Beranda Admin
+globs:
+  - "lib/screens/**/manage_device*.dart"
+  - "lib/screens/**/device_management*.dart"
+  - "lib/screens/**/devices/**/*.dart"
+alwaysApply: false
+---
+
+# SmartClass — Manage Device UI Rules
+
+## 1. Tujuan
+
+Rancang dan implementasikan halaman **Manage Device** untuk Admin SmartClass.
+
+Belum ada desain referensi khusus. Buat desain UI baru yang konsisten dengan design system SmartClass, terutama:
+- Beranda Admin
+- Room Page
+- Room Detail
+- Manage Room
+- Schedule
+- Add/Edit Schedule
+
+Halaman ini digunakan untuk administrasi perangkat IoT, bukan halaman kontrol perangkat sehari-hari pada Room Detail.
+
+Ikuti `.cursor/rules/smartclass-ui-general.mdc` dan aturan Atomic Design yang tersedia.
+
+Sebelum coding, periksa struktur project, komponen UI, aset, model, service, dan endpoint backend yang sudah ada.
+
+## 2. Navigasi halaman
+
+**Manage Device dibuka melalui Quick Access → Manage Device pada Beranda Admin, bukan melalui Navbar.**
+
+Alur navigasi:
+
+Beranda Admin → Quick Access → Manage Device
+
+Ketentuan:
+- Hubungkan tombol `Manage Device` pada Quick Access Beranda Admin ke halaman ini.
+- Tombol kembali harus mengembalikan Admin ke Beranda Admin.
+- Jangan menambahkan Manage Device sebagai item Navbar.
+- Jangan membuat Navbar baru atau bottom navigation khusus untuk halaman ini.
+- Jangan mengubah item Navbar utama.
+- Pastikan halaman hanya dapat diakses oleh role `ADMIN`.
+- Pertahankan autentikasi JWT dan mekanisme otorisasi yang sudah tersedia.
+
+## 3. Arah desain UI
+
+Rancang desain mobile-first yang mengikuti gaya visual SmartClass.
+
+Gunakan karakteristik berikut:
+- Dark mode.
+- Background hitam dengan aksen gradient biru gelap/cyan pada bagian atas.
+- Teks utama putih.
+- Teks sekunder abu-abu muda.
+- Card dan panel abu-abu gelap dengan sudut membulat.
+- Aksen biru SmartClass untuk tombol utama dan elemen interaktif.
+- Tipografi, spacing, radius, ikon, dan hierarki visual konsisten dengan Beranda Admin, Manage Room, dan Schedule.
+- Utamakan kartu atau daftar perangkat yang nyaman dibaca di layar ponsel.
+- Jangan memaksakan tabel desktop ke layar mobile.
+- Gunakan aset lokal yang tersedia jika sesuai.
+- Periksa folder `assets/` sebelum menggunakan atau membuat path aset baru.
+- Pastikan layout responsif dan tidak mengalami overflow pada berbagai ukuran layar Android.
+
+Karena belum ada desain khusus, tentukan layout yang paling sesuai dengan pola UI SmartClass yang sudah ada. Jangan menyalin mentah-mentah desain dari template aplikasi lain.
+
+## 4. Susunan halaman Manage Device
+
+### A. Header
+
+Tampilkan:
+- Judul `Manage Device`.
+- Subtitle singkat, misalnya `Manage classroom devices`.
+- Tombol kembali.
+- Tombol `Add Device` jika fitur tambah perangkat didukung backend.
+
+Gunakan gaya header yang konsisten dengan halaman Manage Room dan Schedule.
+
+### B. Ringkasan perangkat
+
+Jika data backend mendukungnya, tampilkan kartu ringkasan seperti:
+- Total Devices.
+- Enabled Devices.
+- Disabled Devices.
+- Jumlah perangkat berdasarkan kategori.
+
+Semua angka harus dihitung dari data aktual backend.
+
+Jangan menggunakan angka hardcoded atau data dummy yang terlihat seperti data nyata.
+
+Jika statistik tidak relevan atau datanya tidak tersedia, jangan memaksakan bagian ini.
+
+### C. Search dan filter
+
+Sediakan:
+- Search berdasarkan nama perangkat atau informasi lain yang memang tersedia pada model.
+- Filter kategori berdasarkan jenis perangkat yang didukung sistem.
+- Filter status `All`, `Enabled`, dan `Disabled` jika backend memang menyediakan konsep status tersebut.
+
+Kategori perangkat dapat mencakup Lamp, Air Conditioner, dan Projector jika nilai tersebut benar-benar sesuai dengan model dan backend.
+
+Ketentuan:
+- Search harus berfungsi.
+- Filter harus berfungsi.
+- Search dan filter dapat digunakan bersamaan.
+- Tampilkan empty state jika tidak ada perangkat yang cocok.
+- Jangan mengarang kategori atau nilai enum.
+
+### D. Daftar perangkat
+
+Gunakan kartu atau row yang rapi dan konsisten dengan UI SmartClass.
+
+Setiap kartu dapat menampilkan informasi berikut jika tersedia:
+- Nama atau identifier perangkat.
+- Jenis/kategori perangkat.
+- Ruangan tempat perangkat dipasang.
+- Status perangkat.
+- Status enabled/disabled.
+- Aksi Edit dan Delete jika didukung backend.
+
+Jangan menampilkan informasi yang tidak tersedia pada model atau response API.
+
+**Penting:** bedakan status operasional perangkat seperti ON/OFF dari status enabled/disabled apabila backend memodelkannya sebagai dua hal berbeda. Jangan menyamakan keduanya tanpa memeriksa implementasi yang sudah ada.
+
+## 5. Tambah dan Edit Device
+
+Sebelum membuat form baru, periksa apakah halaman Add Device dan Edit Device sudah tersedia.
+
+Jika belum ada dan backend mendukung operasi CRUD, buat form yang konsisten dengan halaman Add/Edit Schedule dan Add/Edit Room.
+
+Form dapat mencakup, jika didukung backend:
+- Nama atau identifier perangkat.
+- Jenis perangkat.
+- Ruangan tempat perangkat dipasang.
+- Status enabled/disabled jika tersedia.
+
+Ketentuan:
+- Gunakan label dan validasi yang jelas.
+- Gunakan pilihan ruangan dari data yang tersedia jika perangkat memang memiliki relasi dengan ruangan.
+- Gunakan nilai kategori sesuai enum atau model backend.
+- Form Edit harus terisi dengan data perangkat yang dipilih.
+- Sediakan tombol Cancel dan Create Device atau Save Changes sesuai konteks.
+- Jangan membuat halaman duplikat jika form sudah tersedia.
+- Jangan menambahkan field, enum, atau relasi baru yang tidak didukung backend.
+
+## 6. Aksi perangkat
+
+Manage Device merupakan halaman administrasi perangkat, bukan pengganti halaman Room Detail.
+
+Ketentuan:
+- Jangan menambahkan kontrol ON/OFF pada halaman ini kecuali fungsi tersebut memang menjadi bagian dari administrasi perangkat dan didukung backend.
+- Gunakan aksi Enable/Disable hanya jika service dan endpoint yang tersedia mendukungnya.
+- Delete harus menampilkan dialog konfirmasi sebelum menghapus.
+- Setelah operasi berhasil, perbarui daftar dan statistik.
+- Tampilkan feedback sukses atau gagal berdasarkan respons operasi sebenarnya.
+- Cegah pengiriman request ganda selama operasi berlangsung.
+- Jangan mengubah status visual secara permanen sebelum backend mengonfirmasi keberhasilan.
+
+Jika suatu operasi tidak didukung backend, jangan membuat tombol yang terlihat berfungsi tetapi tidak melakukan tindakan nyata.
+
+## 7. Atomic Design
+
+Terapkan Atomic Design secara pragmatis. Gunakan kembali komponen yang sudah ada dan hindari pemecahan widget kecil yang tidak diperlukan.
+
+### Atoms
+Contoh:
+- Status badge.
+- Ikon kategori perangkat.
+- Tombol dasar.
+- Label.
+- Ikon aksi.
+
+### Molecules
+Contoh:
+- Search field.
+- Filter chip.
+- Metadata perangkat.
+- Baris status perangkat.
+
+### Organisms
+Contoh:
+- Header Manage Device.
+- Kartu ringkasan perangkat.
+- Kelompok search dan filter.
+- Kartu perangkat.
+- Dialog konfirmasi Delete.
+
+### Templates
+Mengatur layout yang menyusun:
+- Header.
+- Ringkasan perangkat jika tersedia.
+- Search dan filter.
+- Daftar perangkat.
+- Area konten dan tombol yang diperlukan.
+
+### Pages
+Halaman Manage Device bertanggung jawab untuk:
+- Mengelola state pencarian dan filter.
+- Memanggil service perangkat.
+- Menangani loading, error, dan empty state.
+- Menghubungkan aksi tambah, edit, delete, dan enabled/disabled jika didukung.
+- Mengatur navigasi kembali ke Beranda Admin.
+
+Pisahkan UI dari request HTTP dan aturan bisnis.
+
+Komponen visual menerima data dan callback melalui parameter. Jangan menaruh request API di atoms, molecules, organisms, atau templates.
+
+Ikuti konvensi folder dan penamaan project yang sudah ada.
+
+Jangan membuat model, service, atau komponen duplikat jika implementasi yang sesuai sudah tersedia.
+
+## 8. Integrasi backend
+
+Sebelum coding, periksa:
+- Model/entity perangkat.
+- Device service atau API client Flutter.
+- Endpoint backend yang tersedia.
+- Relasi perangkat dengan ruangan.
+- Nilai enum dan aturan status.
+- Aturan authorization.
+- Navigasi Quick Access Manage Device di Beranda Admin.
+
+Ketentuan:
+- Gunakan endpoint yang benar-benar tersedia.
+- Jangan mengarang endpoint, field, kategori, enum, atau kemampuan CRUD.
+- Jangan mengubah backend hanya untuk menyesuaikan UI.
+- Jangan menggunakan data dummy seolah-olah data asli.
+- Pertahankan JWT dan secure token storage.
+- Jangan merusak alur login atau fitur yang sudah berjalan.
+- Jika perubahan kecil pada Beranda Admin diperlukan untuk menghubungkan Quick Access, lakukan seminimal mungkin dan laporkan perubahan tersebut.
+
+Jika API belum mendukung fitur tertentu, jangan berpura-pura bahwa fitur tersebut sudah berfungsi. Laporkan keterbatasannya.
+
+## 9. Loading, Error, dan Empty State
+
+Sediakan:
+- Loading state saat mengambil atau menyimpan data.
+- Error state dengan pesan yang jelas.
+- Tombol coba lagi jika sesuai.
+- Empty state ketika belum ada perangkat.
+- Empty state ketika pencarian atau filter tidak menemukan hasil.
+- Feedback sukses/gagal untuk operasi yang benar-benar didukung backend.
+
+Jika API gagal, jangan menampilkan data palsu sebagai data asli.
+
+## 10. Validasi setelah implementasi
+
+Setelah implementasi:
+
+1. Jalankan `dart format` pada file yang berubah.
+2. Jalankan `flutter analyze` dan perbaiki error yang disebabkan perubahan.
+3. Uji navigasi dari Quick Access Beranda Admin.
+4. Uji tombol kembali menuju Beranda Admin.
+5. Uji search dan filter.
+6. Uji loading, error, dan empty state.
+7. Uji Add/Edit/Delete atau Enable/Disable jika backend mendukungnya.
+8. Pastikan Manage Device tidak ditambahkan sebagai item Navbar.
+9. Pastikan halaman hanya dapat diakses Admin dan backend tetap memverifikasi role.
+10. Laporkan file yang dibuat atau diubah, endpoint yang benar-benar digunakan, fitur yang berhasil, dan keterbatasan backend.
+
+Jangan mengklaim pengujian berhasil jika belum benar-benar dijalankan.
