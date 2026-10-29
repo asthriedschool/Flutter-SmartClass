@@ -24,6 +24,30 @@ class ScheduleService {
     return Schedule.fromJson(json);
   }
 
+  Future<void> createIncidentalUsage({
+    required int roomId,
+    required String requesterName,
+    required String activityName,
+    required String scheduleDate,
+    required String startTime,
+    required String endTime,
+  }) async {
+    await _apiClient.sendObject(
+      'POST',
+      '/schedules',
+      body: {
+        'id_room': roomId,
+        'requester_name': requesterName,
+        'activity_name': activityName,
+        'schedule_type': 'ONCE',
+        'schedule_date': scheduleDate,
+        'start_time': startTime,
+        'end_time': endTime,
+      },
+      fallback: 'Penggunaan ruangan gagal disimpan.',
+    );
+  }
+
   Future<Schedule> updateSchedule({
     required int idSchedule,
     required Map<String, dynamic> body,

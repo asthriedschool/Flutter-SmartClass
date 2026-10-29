@@ -24,13 +24,17 @@ class DeviceControlTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final on = device.isOn;
     final disabled = device.isEnabled == false;
-    final statusLabel = disabled
-        ? 'Disabled'
-        : device.status == 'UNKNOWN'
-        ? 'Unknown'
-        : on
-        ? 'ON'
-        : 'OFF';
+    final operationalStatus = device.status == 'ON' ||
+            device.status == 'OFF'
+        ? device.status
+        : 'Unknown';
+    final administrativeStatus = device.isEnabled == null
+        ? ''
+        : disabled
+        ? ' · Disabled'
+        : ' · Enabled';
+    final statusLabel =
+        '$operationalStatus$administrativeStatus';
     final tile = Material(
       color: on && !disabled
           ? const Color(0xFF1E6FEA)

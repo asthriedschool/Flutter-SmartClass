@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import '../../models/room.dart';
 import '../../models/schedule.dart';
 import '../../network/api_client.dart';
+import '../../services/auth_service.dart';
 import '../../services/room_service.dart';
 import '../../services/schedule_service.dart';
 import '../../shared/app_colors.dart';
 import '../../shared/widgets/templates/schedule_form_template.dart';
+import '../../storage/token_storage.dart';
 import 'schedule_status.dart';
 
 class ScheduleFormScreen extends StatefulWidget {
@@ -24,6 +26,8 @@ class _ScheduleFormScreenState
   final RoomService _roomService = RoomService();
   final ScheduleService _scheduleService =
       ScheduleService();
+  final AuthService _authService = AuthService();
+  final TokenStorage _tokenStorage = TokenStorage();
   final TextEditingController _subjectController =
       TextEditingController();
   final TextEditingController _lecturerController =
@@ -34,6 +38,7 @@ class _ScheduleFormScreenState
   List<Room> _rooms = const [];
   bool _loading = true;
   bool _saving = false;
+  bool _canManage = false;
   String? _errorMessage;
   int? _roomId;
   bool _customRoom = false;
@@ -81,12 +86,28 @@ class _ScheduleFormScreenState
       _errorMessage = null;
     });
     try {
+      final token = await _tokenStorage.getAccessToken();
+      final role = token == null
+          ? null
+          : _authService.roleFromAccessToken(token);
+      if (role != 'ADMIN') {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _loading = false;
+          _errorMessage =
+              'Anda tidak memiliki izin untuk mengelola jadwal.';
+        });
+        return;
+      }
       final rooms = await _roomService.getRooms();
       if (!mounted) {
         return;
       }
       final current = _roomById(_roomId, rooms);
       setState(() {
+        _canManage = true;
         _rooms = rooms;
         _loading = false;
         if (current != null && current.isCustomEntry) {
@@ -171,7 +192,7 @@ class _ScheduleFormScreenState
   }
 
   Future<void> _save() async {
-    if (_saving) {
+    if (!_canManage || _saving) {
       return;
     }
     final subject = _subjectController.text.trim();
@@ -347,7 +368,7 @@ class _ScheduleFormScreenState
 
   Future<void> _delete() async {
     final schedule = widget.schedule;
-    if (_saving || schedule == null) {
+    if (!_canManage || _saving || schedule == null) {
       return;
     }
     final subject = schedule.activityName.isEmpty

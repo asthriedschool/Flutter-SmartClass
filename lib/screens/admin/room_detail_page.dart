@@ -166,36 +166,58 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
       return;
     }
     final next = device.isOn ? 'OFF' : 'ON';
+    var commandAccepted = false;
     setState(() => _busyIds.add(device.idDevice));
     try {
       await _commandService.createCommand(
         idDevice: device.idDevice,
         command: next,
       );
-      final updated = await _deviceService.updateStatus(
-        idDevice: device.idDevice,
-        status: next,
+      commandAccepted = true;
+      final devices = await _deviceService.getDevices();
+      final updated = devices.where(
+        (item) => item.idDevice == device.idDevice,
       );
+      if (updated.isEmpty) {
+        _message(
+          'Perintah diterima, tetapi status aktual perangkat belum tersedia.',
+        );
+        return;
+      }
       if (!mounted) {
         return;
       }
+      final actualDevice = updated.first;
       setState(() {
         _devices = [
           for (final item in _devices)
-            if (item.idDevice == updated.idDevice)
-              updated
+            if (item.idDevice == actualDevice.idDevice)
+              actualDevice
             else
               item,
         ];
       });
+      if (actualDevice.status != next) {
+        _message(
+          'Perintah diterima, tetapi status aktual belum berubah.',
+        );
+      }
     } on ApiException catch (error) {
       if (error.unauthorized) {
         await _goToLogin();
         return;
       }
-      _message(error.message);
+      _message(
+        commandAccepted
+            ? 'Perintah diterima, tetapi status aktual gagal diperbarui: ${error.message}'
+            : error.message,
+      );
     } catch (_) {
-      _message('Perintah perangkat gagal dikirim.');
+      _message(
+        commandAccepted
+            ? 'Perintah diterima, tetapi status aktual gagal diperbarui.'
+            : 'Perintah perangkat gagal dikirim.',
+      );
     } finally {
       if (mounted) {
         setState(() => _busyIds.remove(device.idDevice));
@@ -321,10 +343,10 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                                 ? 'AUTO MODE'
                                 : _room.operationMode,
                             statusLabel: _room.isEnabled
-                                ? 'Active'
+                                ? 'Enabled'
                                 : _room.systemStatus ==
                                       'DISABLED'
-                                ? 'Inactive'
+                                ? 'Disabled'
                                 : _room.systemStatus,
                             active: _room.isEnabled,
                             pictureUrl: _room.picture,
@@ -339,6 +361,7 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                           if (manual)
                             ManualControlSection(
                               devices: _devices,
+                              devicesReady: _devicesReady,
                               busyIds: _busyIds,
                               switching: _switching,
                               onToggle: _toggle,
@@ -347,6 +370,7 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                           else
                             DeviceStatusSection(
                               devices: _devices,
+                              devicesReady: _devicesReady,
                               switching: _switching,
                               onSwitchMode: _switchMode,
                             ),

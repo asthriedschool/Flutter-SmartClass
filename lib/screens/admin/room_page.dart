@@ -12,6 +12,7 @@ import '../../shared/app_colors.dart';
 import '../../shared/widgets/atoms/asset_image.dart';
 import '../../shared/widgets/molecules/room_search_field.dart';
 import '../../shared/widgets/organisms/smart_bottom_nav.dart';
+import '../../storage/token_storage.dart';
 import '../login/login_screen.dart';
 import 'manage_room_screen.dart';
 import 'room_detail_page.dart';
@@ -32,6 +33,7 @@ class _RoomPageState extends State<RoomPage> {
   final ScheduleService _scheduleService =
       ScheduleService();
   final AuthService _authService = AuthService();
+  final TokenStorage _tokenStorage = TokenStorage();
   final TextEditingController _searchController =
       TextEditingController();
 
@@ -44,6 +46,7 @@ class _RoomPageState extends State<RoomPage> {
   bool _loading = true;
   String? _errorMessage;
   String _filter = 'All';
+  bool _isAdmin = false;
 
   @override
   void initState() {
@@ -63,6 +66,13 @@ class _RoomPageState extends State<RoomPage> {
       _errorMessage = null;
     });
     try {
+      final token = await _tokenStorage.getAccessToken();
+      final role = token == null
+          ? null
+          : _authService.roleFromAccessToken(token);
+      if (mounted) {
+        setState(() => _isAdmin = role == 'ADMIN');
+      }
       final rooms = await _roomService.getRooms();
       var devicesReady = true;
       var devices = const <Device>[];
@@ -163,6 +173,9 @@ class _RoomPageState extends State<RoomPage> {
   }
 
   Future<void> _openManage() async {
+    if (!_isAdmin) {
+      return;
+    }
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => const ManageRoomScreen(),
@@ -270,30 +283,31 @@ class _RoomPageState extends State<RoomPage> {
                               ],
                             ),
                           ),
-                          OutlinedButton.icon(
-                            onPressed: _openManage,
-                            icon: const LocalAssetImage(
-                              directory: berandaAssetDir,
-                              name: 'ManageRoom.svg',
-                              width: 14,
-                              height: 16,
-                              semanticLabel: 'Manage Room',
-                            ),
-                            label: const Text(
-                              'Manage Room',
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(
-                                0xFF3DB7FF,
+                          if (_isAdmin)
+                            OutlinedButton.icon(
+                              onPressed: _openManage,
+                              icon: const LocalAssetImage(
+                                directory: berandaAssetDir,
+                                name: 'ManageRoom.svg',
+                                width: 14,
+                                height: 16,
+                                semanticLabel: 'Manage Room',
                               ),
-                              side: const BorderSide(
-                                color: Color(0xFF3DB7FF),
+                              label: const Text(
+                                'Manage Room',
                               ),
-                              visualDensity:
-                                  VisualDensity.compact,
-                              shape: const StadiumBorder(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(
+                                  0xFF3DB7FF,
+                                ),
+                                side: const BorderSide(
+                                  color: Color(0xFF3DB7FF),
+                                ),
+                                visualDensity:
+                                    VisualDensity.compact,
+                                shape: const StadiumBorder(),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 14),
