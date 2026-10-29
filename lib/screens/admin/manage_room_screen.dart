@@ -6,6 +6,7 @@ import '../../network/api_client.dart';
 import '../../services/auth_service.dart';
 import '../../services/device_service.dart';
 import '../../services/room_service.dart';
+import '../../storage/token_storage.dart';
 import '../../shared/widgets/templates/manage_room_template.dart';
 import '../login/login_screen.dart';
 import 'room_form_screen.dart';
@@ -26,6 +27,7 @@ class _ManageRoomScreenState
   final RoomService _roomService = RoomService();
   final DeviceService _deviceService = DeviceService();
   final AuthService _authService = AuthService();
+  final TokenStorage _tokenStorage = TokenStorage();
   final TextEditingController _searchController =
       TextEditingController();
 
@@ -58,6 +60,21 @@ class _ManageRoomScreenState
       _errorMessage = null;
     });
     try {
+      final token = await _tokenStorage.getAccessToken();
+      final role = token == null
+          ? null
+          : _authService.roleFromAccessToken(token);
+      if (role != 'ADMIN') {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _loading = false;
+          _errorMessage =
+              'Anda tidak memiliki akses ke data ini.';
+        });
+        return;
+      }
       final rooms = await _roomService.getRooms();
       var devicesReady = true;
       var devices = const <Device>[];

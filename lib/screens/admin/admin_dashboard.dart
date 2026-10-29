@@ -61,6 +61,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
     });
     try {
       final token = await _tokenStorage.getAccessToken();
+      final role = token == null
+          ? null
+          : _authService.roleFromAccessToken(token);
+      if (role != 'ADMIN') {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _loading = false;
+          _errorMessage =
+              'Anda tidak memiliki akses ke dashboard ini.';
+        });
+        return;
+      }
       final name = token == null
           ? null
           : _authService.fullNameFromAccessToken(token);

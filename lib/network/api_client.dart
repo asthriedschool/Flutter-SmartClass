@@ -13,10 +13,12 @@ class ApiException implements Exception {
   const ApiException(
     this.message, {
     this.unauthorized = false,
+    this.statusCode,
   });
 
   final String message;
   final bool unauthorized;
+  final int? statusCode;
 }
 
 class ApiClient {
@@ -287,23 +289,26 @@ class ApiClient {
       return const ApiException(
         'Sesi tidak valid. Silakan login kembali.',
         unauthorized: true,
+        statusCode: 401,
       );
     }
     final parsed = _safeMessage(body);
     if (parsed != null) {
-      return ApiException(parsed);
+      return ApiException(parsed, statusCode: statusCode);
     }
     if (statusCode == 403) {
       return const ApiException(
         'Anda tidak memiliki akses ke data ini.',
+        statusCode: 403,
       );
     }
     if (statusCode >= 500) {
-      return const ApiException(
+      return ApiException(
         'Terjadi gangguan pada server. Coba lagi.',
+        statusCode: statusCode,
       );
     }
-    return ApiException(fallback);
+    return ApiException(fallback, statusCode: statusCode);
   }
 
   String? _safeMessage(String? body) {

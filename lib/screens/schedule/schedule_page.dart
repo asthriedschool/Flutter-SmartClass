@@ -13,6 +13,7 @@ import '../../storage/token_storage.dart';
 import '../admin/room_page.dart';
 import '../profile/profile_page.dart';
 import '../login/login_screen.dart';
+import 'incidental_usage_screen.dart';
 import 'schedule_form_screen.dart';
 import 'schedule_status.dart';
 
@@ -37,6 +38,7 @@ class _SchedulePageState extends State<SchedulePage> {
   bool _loading = true;
   bool _unauthorized = false;
   bool _canManage = false;
+  bool _isPetugas = false;
   String? _errorMessage;
   String _query = '';
   String _filter = 'All';
@@ -78,6 +80,7 @@ class _SchedulePageState extends State<SchedulePage> {
       }
       setState(() {
         _canManage = role == 'ADMIN';
+        _isPetugas = role == 'PETUGAS';
         _schedules = schedules;
         _rooms = rooms;
         _loading = false;
@@ -139,6 +142,9 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   Future<void> _openForm(Schedule? schedule) async {
+    if (!_canManage) {
+      return;
+    }
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) =>
@@ -150,8 +156,22 @@ class _SchedulePageState extends State<SchedulePage> {
     }
   }
 
+  Future<void> _openIncidentalUsage() async {
+    if (!_isPetugas) {
+      return;
+    }
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => const IncidentalUsageScreen(),
+      ),
+    );
+    if (saved == true && mounted) {
+      await _load();
+    }
+  }
+
   Future<void> _delete(int id) async {
-    if (_busyId != null) {
+    if (!_canManage || _busyId != null) {
       return;
     }
     Schedule? schedule;
@@ -315,6 +335,9 @@ class _SchedulePageState extends State<SchedulePage> {
               onBack: () =>
                   Navigator.of(context).maybePop(),
               onAdd: () => _openForm(null),
+              onIncidentalUsage: _isPetugas
+                  ? _openIncidentalUsage
+                  : null,
               onSearchChanged: (value) =>
                   setState(() => _query = value),
               onSearchClear: () {

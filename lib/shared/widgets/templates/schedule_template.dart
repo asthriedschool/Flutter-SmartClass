@@ -49,6 +49,7 @@ class ScheduleTemplate extends StatelessWidget {
     required this.busyId,
     required this.onBack,
     required this.onAdd,
+    this.onIncidentalUsage,
     required this.onSearchChanged,
     required this.onSearchClear,
     required this.onFilter,
@@ -72,6 +73,7 @@ class ScheduleTemplate extends StatelessWidget {
   final int? busyId;
   final VoidCallback onBack;
   final VoidCallback? onAdd;
+  final VoidCallback? onIncidentalUsage;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onSearchClear;
   final ValueChanged<String> onFilter;
@@ -102,6 +104,31 @@ class ScheduleTemplate extends StatelessWidget {
               canAdd: canManage,
             ),
             const SizedBox(height: 16),
+            if (onIncidentalUsage != null) ...[
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: onIncidentalUsage,
+                  icon: const Icon(Icons.event_available),
+                  label: const Text(
+                    'Penggunaan Insidental',
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(
+                      0xFF3DB7FF,
+                    ),
+                    side: const BorderSide(
+                      color: Color(0xFF3DB7FF),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                    ),
+                    shape: const StadiumBorder(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             ScheduleSearchField(
               controller: searchController,
               onChanged: onSearchChanged,

@@ -226,11 +226,13 @@ class DeviceStatusSection extends StatelessWidget {
   const DeviceStatusSection({
     super.key,
     required this.devices,
+    required this.devicesReady,
     required this.switching,
     required this.onSwitchMode,
   });
 
   final List<Device> devices;
+  final bool devicesReady;
   final bool switching;
   final VoidCallback onSwitchMode;
 
@@ -249,12 +251,17 @@ class DeviceStatusSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        if (groups.isEmpty)
+        if (!devicesReady)
+          const Text(
+            'Status perangkat tidak tersedia.',
+            style: TextStyle(color: AppColors.muted),
+          )
+        else if (devices.isEmpty)
           const Text(
             'Tidak ada perangkat di ruangan ini.',
             style: TextStyle(color: AppColors.muted),
           )
-        else
+        else if (groups.isNotEmpty)
           Row(
             children: [
               for (final group in groups) ...[
@@ -269,6 +276,19 @@ class DeviceStatusSection extends StatelessWidget {
               ],
             ],
           ),
+        if (devicesReady && devices.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          for (final device in devices) ...[
+            DeviceControlTile(
+              device: device,
+              iconName: device.typeIcon,
+              busy: false,
+              expanded: true,
+              onPressed: null,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ],
         const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
@@ -301,6 +321,7 @@ class ManualControlSection extends StatelessWidget {
   const ManualControlSection({
     super.key,
     required this.devices,
+    required this.devicesReady,
     required this.busyIds,
     required this.switching,
     required this.onToggle,
@@ -308,6 +329,7 @@ class ManualControlSection extends StatelessWidget {
   });
 
   final List<Device> devices;
+  final bool devicesReady;
   final Set<int> busyIds;
   final bool switching;
   final ValueChanged<Device> onToggle;
@@ -318,6 +340,12 @@ class ManualControlSection extends StatelessWidget {
     final lamps = _of(devices, 'LAMP');
     final acs = _of(devices, 'AC');
     final projectors = _of(devices, 'PROJECTOR');
+    final unsupported = devices
+        .where(
+          (device) =>
+              !deviceTypes.contains(device.deviceType),
+        )
+        .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -330,14 +358,17 @@ class ManualControlSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        if (lamps.isEmpty &&
-            acs.isEmpty &&
-            projectors.isEmpty)
+        if (!devicesReady)
+          const Text(
+            'Status perangkat tidak tersedia.',
+            style: TextStyle(color: AppColors.muted),
+          )
+        else if (devices.isEmpty)
           const Text(
             'Tidak ada perangkat di ruangan ini.',
             style: TextStyle(color: AppColors.muted),
           ),
-        if (lamps.isNotEmpty)
+        if (devicesReady && lamps.isNotEmpty)
           _Group(
             title: 'Lamp',
             child: SingleChildScrollView(
@@ -361,7 +392,7 @@ class ManualControlSection extends StatelessWidget {
               ),
             ),
           ),
-        if (acs.isNotEmpty)
+        if (devicesReady && acs.isNotEmpty)
           _Group(
             title: 'Air Conditioner',
             child: Wrap(
@@ -380,7 +411,7 @@ class ManualControlSection extends StatelessWidget {
               ],
             ),
           ),
-        if (projectors.isNotEmpty)
+        if (devicesReady && projectors.isNotEmpty)
           _Group(
             title: 'Projector',
             child: Column(
@@ -394,6 +425,24 @@ class ManualControlSection extends StatelessWidget {
                     onPressed: device.isEnabled == false
                         ? null
                         : () => onToggle(device),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ],
+            ),
+          ),
+        if (devicesReady && unsupported.isNotEmpty)
+          _Group(
+            title: 'Unsupported devices · status only',
+            child: Column(
+              children: [
+                for (final device in unsupported) ...[
+                  DeviceControlTile(
+                    device: device,
+                    iconName: device.typeIcon,
+                    busy: false,
+                    expanded: true,
+                    onPressed: null,
                   ),
                   const SizedBox(height: 8),
                 ],
