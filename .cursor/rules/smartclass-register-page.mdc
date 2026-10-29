@@ -1,0 +1,82 @@
+---
+description: UI rules untuk Register Page SmartClass IoT yang konsisten dengan Login Page dan autentikasi existing
+globs:
+  - "lib/screens/**/register*.dart"
+  - "lib/screens/**/sign_up*.dart"
+  - "lib/widgets/**/register*.dart"
+alwaysApply: false
+---
+
+# SmartClass Register Page Rules
+
+## 1. Goal
+Implementasikan Register Page SmartClass IoT dengan desain yang konsisten dengan Login Page dan UI existing. Gunakan struktur project yang sudah ada. Jangan membuat project baru atau menggandakan implementasi autentikasi.
+
+## 2. Design
+- Ikuti dark theme, warna biru/cyan, gradient, typography, spacing, radius, dan button style dari Login Page.
+- Gunakan desain mobile-first yang nyaman digunakan pada layar HP.
+- Terapkan Atomic Design sesuai struktur project existing.
+- Gunakan kembali komponen form, button, input, dan logo yang sudah tersedia.
+- Pastikan keyboard tidak menutupi field atau tombol Register.
+- Sediakan scroll jika tinggi layar tidak mencukupi.
+
+## 3. Register Form
+Periksa model user dan kontrak API terlebih dahulu. Tampilkan field yang memang didukung backend, dengan prioritas:
+- Full Name.
+- Email.
+- Password.
+- Confirm Password.
+
+Ketentuan:
+- Gunakan label dan hint yang jelas.
+- Sediakan tombol untuk menampilkan atau menyembunyikan password.
+- Validasi field wajib, format email, dan kecocokan password.
+- Tampilkan pesan validasi yang mudah dipahami.
+- Hindari menghapus input pengguna ketika terjadi kesalahan yang tidak mengharuskan form direset.
+- Jangan menampilkan role ADMIN sebagai pilihan registrasi publik.
+- Jangan menambahkan field yang tidak diperlukan backend.
+
+## 4. Navigation
+- Sediakan navigasi kembali ke Login Page, misalnya melalui teks "Already have an account? Login".
+- Pertahankan pola navigasi dan route existing.
+- Cegah submit berulang ketika request registrasi sedang diproses.
+- Setelah registrasi berhasil, arahkan pengguna sesuai alur autentikasi existing, misalnya kembali ke Login Page jika registrasi tidak otomatis melakukan login.
+
+## 5. Backend Integration
+- Periksa AuthService, ApiConfig, model request/response, TokenStorage, dan endpoint autentikasi yang sudah tersedia.
+- Gunakan endpoint registrasi yang benar-benar tersedia di backend.
+- Jangan mengarang endpoint, request field, response, atau aturan password.
+- Pertahankan mekanisme JWT dan token storage existing.
+- Jangan mengubah backend atau database tanpa kebutuhan yang jelas.
+- Periksa aturan role ADMIN dan PETUGAS agar registrasi tidak memungkinkan pengguna memperoleh hak akses ADMIN secara mandiri.
+
+Jika backend hanya menyediakan pembuatan akun melalui Admin atau belum memiliki endpoint registrasi publik, jangan membuat registrasi palsu. Jelaskan keterbatasannya dan usulkan penyesuaian backend secara terpisah.
+
+## 6. UI States
+- Loading state ketika registrasi sedang diproses.
+- Error state untuk kegagalan validasi atau request.
+- Success feedback ketika registrasi berhasil.
+- Tangani email yang sudah terdaftar berdasarkan response backend.
+- Pastikan tombol Register dinonaktifkan sementara selama request berlangsung.
+
+## 7. Security
+- Jangan mencetak password atau token ke log.
+- Jangan menyimpan password dalam plain text.
+- Jangan menyimpan password atau confirm password secara permanen di local storage.
+- Gunakan HTTPS untuk deployment produksi jika didukung lingkungan backend.
+- Jangan mengandalkan validasi frontend sebagai satu-satunya mekanisme keamanan.
+
+## 8. Constraints
+- Jangan merusak Login Page, Dashboard, Profile, atau halaman existing lainnya.
+- Jangan menggandakan AuthService, ApiConfig, atau komponen autentikasi.
+- Jangan menambahkan dependency baru tanpa kebutuhan yang jelas.
+- Pisahkan UI dan logic sesuai arsitektur project.
+- Pertahankan kompatibilitas dengan Flutter dan backend Spring Boot existing.
+
+## 9. Verification
+- Jalankan dart format pada file yang berubah.
+- Jalankan flutter analyze.
+- Periksa validasi form dan show/hide password.
+- Uji navigasi Register ke Login.
+- Uji request registrasi hanya jika endpoint tersedia.
+- Laporkan file yang dibuat/diubah, hasil pengujian, dan fitur yang belum didukung backend.

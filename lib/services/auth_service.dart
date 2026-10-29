@@ -99,67 +99,100 @@ class AuthService {
     }
   }
 
+  Future<void> register({
+    required String fullName,
+    required String email,
+    required String password,
+  }) async {
+    final url = Uri.parse(
+      '${ApiConfig.baseUrl}/auth/register',
+    );
+
+    try {
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'full_name': fullName,
+              'email': email,
+              'password': password,
+            }),
+          )
+          .timeout(const Duration(seconds: 20));
+
+      final responseData = _decodeBody(response.body);
+
+      if (response.statusCode == 201 ||
+          response.statusCode == 200) {
+        return;
+      }
+
+      throw _registerFailure(
+        response.statusCode,
+        responseData,
+      );
+    } on AuthException {
+      rethrow;
+    } on TimeoutException {
+      throw const AuthException(
+        'Waktu koneksi habis. Coba lagi.',
+      );
+    } on http.ClientException {
+      throw const AuthException(
+        'Tidak dapat terhubung ke server. Periksa koneksi Anda.',
+      );
+    } on FormatException {
+      throw const AuthException(
+        'Registrasi gagal. Coba lagi.',
+      );
+    }
+  }
+
   // Membaca claim role untuk memilih layar awal.
   // Ini bukan verifikasi tanda tangan JWT.
   String? roleFromAccessToken(String accessToken) {
-    final parts = accessToken.split('.');
-    if (parts.length < 2) {
+    final data = _payload(accessToken);
+    if (data == null) {
       return null;
     }
-
-    try {
-      final normalized = base64Url.normalize(parts[1]);
-      final payload = utf8.decode(
-        base64Url.decode(normalized),
-      );
-      final data = jsonDecode(payload);
-      if (data is! Map) {
-        return null;
+    const claimKeys = [
+      'role',
+      'roles',
+      'authorities',
+      'authority',
+    ];
+    for (final key in claimKeys) {
+      final role = _matchRole(data[key]);
+      if (role != null) {
+        return role;
       }
-
-      const claimKeys = [
-        'role',
-        'roles',
-        'authorities',
-        'authority',
-      ];
-      for (final key in claimKeys) {
-        final role = _matchRole(data[key]);
-        if (role != null) {
-          return role;
-        }
-      }
-    } on FormatException {
-      return null;
     }
-
     return null;
   }
 
   // Claim UI saja. Bukan verifikasi tanda tangan JWT.
   String? fullNameFromAccessToken(String accessToken) {
-    final parts = accessToken.split('.');
-    if (parts.length < 2) {
+    final name = _payload(accessToken)?['fullName'];
+    if (name is! String || name.trim().isEmpty) {
       return null;
     }
+    return name.trim();
+  }
 
-    try {
-      final normalized = base64Url.normalize(parts[1]);
-      final payload = utf8.decode(
-        base64Url.decode(normalized),
-      );
-      final data = jsonDecode(payload);
-      if (data is! Map) {
-        return null;
-      }
-      final name = data['fullName'];
-      if (name is! String || name.trim().isEmpty) {
-        return null;
-      }
-      return name.trim();
-    } on FormatException {
+  // Claim UI saja. Subject JWT adalah email.
+  String? emailFromAccessToken(String accessToken) {
+    final data = _payload(accessToken);
+    if (data == null) {
       return null;
     }
+    for (final key in ['sub', 'email']) {
+      final value = data[key];
+      if (value is String && value.trim().isNotEmpty) {
+        return value.trim();
+      }
+    }
+    return null;
   }
 
   // =========================================================
@@ -236,11 +269,56 @@ class AuthException implements Exception {
   final String message;
 }
 
+Map<String, dynamic>? _payload(String accessToken) {
+  final parts = accessToken.split('.');
+  if (parts.length < 2) {
+    return null;
+  }
+  try {
+    final normalized = base64Url.normalize(parts[1]);
+    final payload = utf8.decode(
+      base64Url.decode(normalized),
+    );
+    final data = jsonDecode(payload);
+    if (data is! Map) {
+      return null;
+    }
+    return Map<String, dynamic>.from(data);
+  } on FormatException {
+    return null;
+  }
+}
+
 Object? _decodeBody(String body) {
   if (body.trim().isEmpty) {
     return null;
   }
   return jsonDecode(body);
+}
+
+AuthException _registerFailure(
+  int statusCode,
+  Object? body,
+) {
+  final message = _safeMessage(body);
+  if (statusCode == 409) {
+    return AuthException(
+      message ?? 'Email sudah terdaftar.',
+    );
+  }
+  if (statusCode == 400) {
+    return AuthException(
+      message ?? 'Data registrasi tidak valid.',
+    );
+  }
+  if (statusCode >= 500) {
+    return const AuthException(
+      'Terjadi gangguan pada server. Coba lagi nanti.',
+    );
+  }
+  return AuthException(
+    message ?? 'Registrasi gagal. Coba lagi.',
+  );
 }
 
 AuthException _loginFailure(int statusCode, Object? body) {

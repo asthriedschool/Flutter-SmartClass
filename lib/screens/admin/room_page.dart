@@ -15,6 +15,7 @@ import '../../shared/widgets/organisms/smart_bottom_nav.dart';
 import '../login/login_screen.dart';
 import 'manage_room_screen.dart';
 import 'room_detail_page.dart';
+import '../profile/profile_page.dart';
 import '../schedule/schedule_page.dart';
 import 'room_schedule.dart';
 
@@ -188,16 +189,9 @@ class _RoomPageState extends State<RoomPage> {
       );
       return;
     }
-    const names = {3: 'Profile'};
-    final name = names[index];
-    if (name == null || !mounted) {
-      return;
+    if (index == 3) {
+      ProfilePage.open(context);
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Halaman $name belum tersedia.'),
-      ),
-    );
   }
 
   Future<void> _goToLogin() async {

@@ -13,6 +13,7 @@ import '../../shared/app_colors.dart';
 import '../../shared/widgets/organisms/room_detail_body.dart';
 import '../../shared/widgets/organisms/smart_bottom_nav.dart';
 import '../login/login_screen.dart';
+import '../profile/profile_page.dart';
 import '../schedule/schedule_page.dart';
 import 'room_schedule.dart';
 
@@ -229,10 +230,8 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
       );
       return;
     }
-    const names = {3: 'Profile'};
-    final name = names[index];
-    if (name != null) {
-      _message('Halaman $name belum tersedia.');
+    if (index == 3) {
+      ProfilePage.open(context);
     }
   }
 

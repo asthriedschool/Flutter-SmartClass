@@ -19,6 +19,7 @@ import 'admin_home_data.dart';
 import 'manage_room_screen.dart';
 import 'manage_device_screen.dart';
 import 'manage_users_screen.dart';
+import '../profile/profile_page.dart';
 import '../schedule/schedule_page.dart';
 import 'room_page.dart';
 
@@ -214,12 +215,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
       _openSchedulePage();
       return;
     }
-    const unavailable = <int, String>{3: 'Profile'};
-    final pageName = unavailable[index];
-    if (pageName == null) {
-      return;
+    if (index == 3) {
+      ProfilePage.open(context);
     }
-    _showUnavailable(pageName);
   }
 
   @override
